@@ -118,7 +118,7 @@ public class Ghost {
             return;
         }
 
-        direction = ai.chooseDirection(maze, col, row, direction, pacman.getPosition());
+        direction = ai.chooseDirection(maze, col, row, direction, pacman);
         if (direction == null) {
             GhostMover.snapToCell(position);
         }

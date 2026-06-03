@@ -1,7 +1,7 @@
 package com.picman.model.ai;
 
 import com.picman.model.Maze;
-import com.picman.model.entity.GridPosition;
+import com.picman.model.entity.Pacman;
 import com.picman.movement.TurnPlanner;
 import com.picman.util.Direction;
 
@@ -18,7 +18,7 @@ abstract class ChaseDirectionSelector implements GhostAI {
             int col,
             int row,
             Direction currentDirection,
-            GridPosition target) {
+            Pacman pacman) {
         List<Direction> options = maze.getValidDirections(col, row, currentDirection, true);
         if (options.isEmpty()) {
             return null;
@@ -29,10 +29,10 @@ abstract class ChaseDirectionSelector implements GhostAI {
         if (TurnPlanner.canKeepCurrentDirection(maze, col, row, currentDirection, options)) {
             return currentDirection;
         }
-        return selectBestDirection(col, row, options, createEvaluator(maze, target), currentDirection);
+        return selectBestDirection(col, row, options, createEvaluator(maze, pacman), currentDirection);
     }
 
-    protected abstract DistanceEvaluator createEvaluator(Maze maze, GridPosition target);
+    protected abstract DistanceEvaluator createEvaluator(Maze maze, Pacman pacman);
 
     @FunctionalInterface
     protected interface DistanceEvaluator {

@@ -30,6 +30,16 @@ public class Pacman {
         return position.getRow();
     }
 
+    /**
+     * 目前移動方向；靜止時改為玩家最後按下的方向（對應經典 Pinky 伏擊判定）。
+     */
+    public Direction getFacingDirection() {
+        if (direction != null) {
+            return direction;
+        }
+        return activeDirection;
+    }
+
     public void setActiveDirection(Direction direction) {
         activeDirection = direction;
         if (direction == null) {

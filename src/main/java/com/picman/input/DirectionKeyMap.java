@@ -35,8 +35,11 @@ public final class DirectionKeyMap {
     }
 
     public static boolean isPressed(Direction direction, Set<Integer> pressedKeys) {
+        if (direction == null) {
+            return false;
+        }
         Integer keyCode = DIRECTION_TO_KEY.get(direction);
-        return keyCode != null && pressedKeys.contains(keyCode);
+        return pressedKeys.contains(keyCode);
     }
 
     public static Direction firstPressed(Set<Integer> pressedKeys) {
