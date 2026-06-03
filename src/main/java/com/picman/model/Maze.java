@@ -6,52 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Maze {
-    public static final int EMPTY = 0;
-    public static final int WALL = 1;
-    public static final int COIN = 2;
-
-    /** 0 = 可走，1 = 牆；載入時將 0 轉為金幣 */
-    private static final int[][] RAW_TEMPLATE = {
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-            {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-            {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-            {1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-            {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-            {1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
-            {1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1},
-            {1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1},
-            {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-            {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    };
-
     private final int[][] grid;
 
     public Maze() {
-        grid = copyTemplate();
+        grid = createInitialGrid();
     }
 
     public void reset() {
-        int[][] fresh = copyTemplate();
+        int[][] fresh = createInitialGrid();
         for (int row = 0; row < grid.length; row++) {
             System.arraycopy(fresh[row], 0, grid[row], 0, grid[row].length);
         }
@@ -69,35 +31,35 @@ public class Maze {
         return grid[row][col];
     }
 
+    public CellType getCellType(int col, int row) {
+        return CellType.fromCode(getCell(col, row));
+    }
+
     public boolean isWalkable(int col, int row) {
-        if (!inBounds(col, row)) {
-            return false;
-        }
-        return grid[row][col] != WALL;
+        return inBounds(col, row) && getCellType(col, row) != CellType.WALL;
     }
 
     public boolean tryEatCoin(int col, int row) {
-        if (!inBounds(col, row) || grid[row][col] != COIN) {
+        if (!inBounds(col, row) || getCellType(col, row) != CellType.COIN) {
             return false;
         }
-        grid[row][col] = EMPTY;
+        grid[row][col] = CellType.EMPTY.getCode();
         return true;
     }
 
-    public int countCoins() {
-        int count = 0;
+    public boolean noCoinsLeft() {
         for (int[] row : grid) {
             for (int cell : row) {
-                if (cell == COIN) {
-                    count++;
+                if (cell == CellType.COIN.getCode()) {
+                    return false;
                 }
             }
         }
-        return count;
+        return true;
     }
 
-    public boolean noCoinsLeft() {
-        return countCoins() == 0;
+    public boolean isIntersection(int col, int row) {
+        return countWalkableNeighbors(col, row) > 2;
     }
 
     public List<Direction> getValidDirections(int col, int row, Direction current, boolean excludeReverse) {
@@ -120,16 +82,26 @@ public class Maze {
         return options;
     }
 
+    private int countWalkableNeighbors(int col, int row) {
+        int count = 0;
+        for (Direction direction : Direction.values()) {
+            if (isWalkable(col + direction.dx, row + direction.dy)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private boolean inBounds(int col, int row) {
         return col >= 0 && col < getWidth() && row >= 0 && row < getHeight();
     }
 
-    private static int[][] copyTemplate() {
-        int[][] copy = new int[RAW_TEMPLATE.length][RAW_TEMPLATE[0].length];
-        for (int row = 0; row < RAW_TEMPLATE.length; row++) {
-            for (int col = 0; col < RAW_TEMPLATE[row].length; col++) {
-                int cell = RAW_TEMPLATE[row][col];
-                copy[row][col] = cell == 0 ? COIN : cell;
+    private static int[][] createInitialGrid() {
+        int[][] raw = MazeLayout.RAW;
+        int[][] copy = new int[raw.length][raw[0].length];
+        for (int row = 0; row < raw.length; row++) {
+            for (int col = 0; col < raw[row].length; col++) {
+                copy[row][col] = raw[row][col] == 0 ? CellType.COIN.getCode() : raw[row][col];
             }
         }
         return copy;

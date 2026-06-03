@@ -1,9 +1,7 @@
-package com.picman.util;
+package com.picman.config;
 
-import java.awt.Color;
-
-public final class Constants {
-    private Constants() {
+public final class GameConfig {
+    private GameConfig() {
     }
 
     public static final int TILE_SIZE = 16;
@@ -23,10 +21,7 @@ public final class Constants {
     public static final int GHOST_START_COL = 13;
     public static final int GHOST_START_ROW = 11;
 
-    public static final Color COLOR_BACKGROUND = new Color(0, 0, 0);
-    public static final Color COLOR_WALL = new Color(33, 33, 222);
-    public static final Color COLOR_COIN = new Color(255, 255, 100);
-    public static final Color COLOR_PACMAN = Color.YELLOW;
-    public static final Color COLOR_GHOST = Color.RED;
-    public static final Color COLOR_HUD_TEXT = Color.WHITE;
+    public static final double ENTITY_HIT_RADIUS_RATIO = 0.75;
+    public static final int ENTITY_DRAW_MARGIN = 2;
+    public static final int COIN_DRAW_MARGIN_DIVISOR = 4;
 }
