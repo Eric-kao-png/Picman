@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class GhostFactory {
+    /** 由靠近出口到深處排列；依序從底部出口放出 */
     private static final GhostSpawn[] SPAWNS = {
-            new GhostSpawn(10, 11, Direction.LEFT, RenderTheme.GHOST_RED),
-            new GhostSpawn(12, 11, Direction.RIGHT, RenderTheme.GHOST_PINK),
-            new GhostSpawn(14, 11, Direction.UP, RenderTheme.GHOST_CYAN),
-            new GhostSpawn(16, 11, Direction.DOWN, RenderTheme.GHOST_ORANGE),
+            new GhostSpawn(14, 15, Direction.DOWN, RenderTheme.GHOST_RED),
+            new GhostSpawn(14, 14, Direction.DOWN, RenderTheme.GHOST_PINK),
+            new GhostSpawn(14, 13, Direction.DOWN, RenderTheme.GHOST_CYAN),
+            new GhostSpawn(13, 13, Direction.DOWN, RenderTheme.GHOST_ORANGE),
     };
 
     private GhostFactory() {

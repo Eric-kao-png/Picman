@@ -5,6 +5,7 @@ import com.picman.model.GameStatus;
 import com.picman.model.Maze;
 import com.picman.model.entity.Ghost;
 import com.picman.model.entity.GhostFactory;
+import com.picman.model.entity.GhostReleaseScheduler;
 import com.picman.model.entity.Pacman;
 import com.picman.render.GameRenderer;
 import com.picman.render.ViewLayout;
@@ -17,8 +18,13 @@ public class Game {
     private final Maze maze = new Maze();
     private final Pacman pacman = new Pacman();
     private final List<Ghost> ghosts = GhostFactory.createAll();
+    private final GhostReleaseScheduler ghostReleaseScheduler = new GhostReleaseScheduler();
     private final GameSession session = new GameSession();
     private final GameRenderer renderer = new GameRenderer();
+
+    public Game() {
+        ghostReleaseScheduler.reset(ghosts);
+    }
 
     public void update() {
         if (!session.isPlaying()) {
@@ -32,6 +38,7 @@ public class Game {
             session.onCoinCollected();
         }
 
+        ghostReleaseScheduler.tick(ghosts);
         for (Ghost ghost : ghosts) {
             ghost.update(maze, pacman);
         }
@@ -55,7 +62,7 @@ public class Game {
     public void restart() {
         maze.reset();
         pacman.reset();
-        ghosts.forEach(Ghost::reset);
+        ghostReleaseScheduler.reset(ghosts);
         session.reset();
     }
 
@@ -84,7 +91,7 @@ public class Game {
         session.onGhostHit();
         if (session.getStatus() == GameStatus.PLAYING) {
             pacman.reset();
-            ghosts.forEach(Ghost::reset);
+            ghostReleaseScheduler.reset(ghosts);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.picman.model;
 
+import com.picman.config.GhostHouseConfig;
 import com.picman.util.Direction;
 
 import java.util.ArrayList;
@@ -62,6 +63,39 @@ public class Maze {
         return countWalkableNeighbors(col, row) > 2;
     }
 
+    public boolean isGhostHouseInterior(int col, int row) {
+        return isGhostHouseInteriorCell(col, row);
+    }
+
+    private static boolean isGhostHouseInteriorCell(int col, int row) {
+        return col >= GhostHouseConfig.INTERIOR_MIN_COL
+                && col <= GhostHouseConfig.INTERIOR_MAX_COL
+                && row >= GhostHouseConfig.INTERIOR_MIN_ROW
+                && row <= GhostHouseConfig.INTERIOR_MAX_ROW;
+    }
+
+    public static boolean isGhostHouseWallCell(int col, int row) {
+        if (row == GhostHouseConfig.WALL_TOP_ROW
+                && col >= GhostHouseConfig.WALL_MIN_COL
+                && col <= GhostHouseConfig.WALL_MAX_COL) {
+            return true;
+        }
+        if (row == GhostHouseConfig.WALL_BOTTOM_ROW
+                && col >= GhostHouseConfig.WALL_MIN_COL
+                && col <= GhostHouseConfig.WALL_MAX_COL
+                && !GhostHouseConfig.isDoorCell(col, row)) {
+            return true;
+        }
+        if (col == GhostHouseConfig.WALL_MIN_COL
+                && row >= GhostHouseConfig.INTERIOR_MIN_ROW
+                && row <= GhostHouseConfig.INTERIOR_MAX_ROW) {
+            return true;
+        }
+        return col == GhostHouseConfig.WALL_MAX_COL
+                && row >= GhostHouseConfig.INTERIOR_MIN_ROW
+                && row <= GhostHouseConfig.INTERIOR_MAX_ROW;
+    }
+
     public List<Direction> getValidDirections(int col, int row, Direction current, boolean excludeReverse) {
         List<Direction> options = new ArrayList<>();
         for (Direction direction : Direction.values()) {
@@ -101,7 +135,17 @@ public class Maze {
         int[][] copy = new int[raw.length][raw[0].length];
         for (int row = 0; row < raw.length; row++) {
             for (int col = 0; col < raw[row].length; col++) {
-                copy[row][col] = raw[row][col] == 0 ? CellType.COIN.getCode() : raw[row][col];
+                if (isGhostHouseWallCell(col, row)) {
+                    copy[row][col] = CellType.WALL.getCode();
+                } else if (isGhostHouseInteriorCell(col, row)
+                        || GhostHouseConfig.isDoorCell(col, row)
+                        || GhostHouseConfig.isExitCorridorCell(col, row)) {
+                    copy[row][col] = CellType.EMPTY.getCode();
+                } else if (raw[row][col] == 0) {
+                    copy[row][col] = CellType.COIN.getCode();
+                } else {
+                    copy[row][col] = raw[row][col];
+                }
             }
         }
         return copy;
