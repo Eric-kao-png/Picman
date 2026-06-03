@@ -1,5 +1,6 @@
 package com.picman;
 
+import com.picman.game.GameCollisionHandler;
 import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
 import com.picman.model.Maze;
@@ -21,6 +22,7 @@ public class Game {
     private final GhostReleaseScheduler ghostReleaseScheduler = new GhostReleaseScheduler();
     private final GameSession session = new GameSession();
     private final GameRenderer renderer = new GameRenderer();
+    private final GameCollisionHandler collisionHandler = new GameCollisionHandler();
 
     public Game() {
         ghostReleaseScheduler.reset(ghosts);
@@ -42,7 +44,7 @@ public class Game {
         for (Ghost ghost : ghosts) {
             ghost.update(maze, pacman);
         }
-        handleGhostCollision();
+        collisionHandler.resolve(pacman, ghosts, session, ghostReleaseScheduler);
 
         if (maze.noCoinsLeft()) {
             session.onAllCoinsCollected();
@@ -76,22 +78,5 @@ public class Game {
 
     public int getPanelHeight() {
         return ViewLayout.panelHeight(maze);
-    }
-
-    private void handleGhostCollision() {
-        if (session.isInvincible()) {
-            return;
-        }
-
-        boolean hit = ghosts.stream().anyMatch(ghost -> ghost.collidesWith(pacman));
-        if (!hit) {
-            return;
-        }
-
-        session.onGhostHit();
-        if (session.getStatus() == GameStatus.PLAYING) {
-            pacman.reset();
-            ghostReleaseScheduler.reset(ghosts);
-        }
     }
 }

@@ -1,33 +1,17 @@
 package com.picman.model.entity;
 
-import com.picman.config.GameConfig;
 import com.picman.config.GhostSpawn;
-import com.picman.config.RenderTheme;
-import com.picman.model.ai.GhostChaseAI;
-import com.picman.model.ai.PathfindingChaseGhostAI;
-import com.picman.util.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class GhostFactory {
-    private static final PathfindingChaseGhostAI RED_AI = new PathfindingChaseGhostAI();
-    private static final GhostChaseAI DEFAULT_CHASE_AI = new GhostChaseAI();
-
-    /** 由靠近出口到深處排列；依序從底部出口放出 */
-    private static final GhostSpawn[] SPAWNS = {
-            new GhostSpawn(14, 15, Direction.DOWN, RenderTheme.GHOST_RED, RED_AI),
-            new GhostSpawn(14, 14, Direction.DOWN, RenderTheme.GHOST_PINK, DEFAULT_CHASE_AI),
-            new GhostSpawn(14, 13, Direction.DOWN, RenderTheme.GHOST_CYAN, DEFAULT_CHASE_AI),
-            new GhostSpawn(13, 13, Direction.DOWN, RenderTheme.GHOST_ORANGE, DEFAULT_CHASE_AI),
-    };
-
     private GhostFactory() {
     }
 
     public static List<Ghost> createAll() {
-        List<Ghost> ghosts = new ArrayList<>(GameConfig.GHOST_COUNT);
-        for (GhostSpawn spawn : SPAWNS) {
+        List<Ghost> ghosts = new ArrayList<>(GhostDefinitions.ALL.size());
+        for (GhostSpawn spawn : GhostDefinitions.ALL) {
             ghosts.add(new Ghost(spawn));
         }
         return List.copyOf(ghosts);

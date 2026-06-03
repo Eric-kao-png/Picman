@@ -1,6 +1,5 @@
 package com.picman.model.entity;
 
-import com.picman.config.GameConfig;
 import com.picman.movement.GridMath;
 
 public class GridPosition {
@@ -25,14 +24,6 @@ public class GridPosition {
 
     public double getCenterY() {
         return centerY;
-    }
-
-    public double getDrawX() {
-        return centerX - GameConfig.TILE_SIZE / 2.0;
-    }
-
-    public double getDrawY() {
-        return centerY - GameConfig.TILE_SIZE / 2.0;
     }
 
     public void setCenter(double centerX, double centerY) {

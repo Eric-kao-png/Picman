@@ -2,6 +2,7 @@ package com.picman;
 
 import com.picman.config.GameConfig;
 import com.picman.config.RenderTheme;
+import com.picman.input.GameKeyBindings;
 import com.picman.input.KeyboardInput;
 
 import javax.swing.JPanel;
@@ -9,8 +10,6 @@ import javax.swing.Timer;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class GamePanel extends JPanel {
     private final Game game;
@@ -22,7 +21,7 @@ public class GamePanel extends JPanel {
         setPreferredSize(new Dimension(game.getPanelWidth(), game.getPanelHeight()));
         setFocusable(true);
         setBackground(RenderTheme.BACKGROUND);
-        addKeyListener(createKeyAdapter());
+        addKeyListener(new GameKeyBindings(game, keyboardInput));
 
         timer = new Timer(GameConfig.TICK_MS, e -> tick());
         timer.start();
@@ -38,24 +37,5 @@ public class GamePanel extends JPanel {
         game.setActiveDirection(keyboardInput.getActiveDirection());
         game.update();
         repaint();
-    }
-
-    private KeyAdapter createKeyAdapter() {
-        return new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_R) {
-                    game.restart();
-                    keyboardInput.clear();
-                    return;
-                }
-                keyboardInput.onKeyPressed(e.getKeyCode());
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                keyboardInput.onKeyReleased(e.getKeyCode());
-            }
-        };
     }
 }

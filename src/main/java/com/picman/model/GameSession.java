@@ -28,8 +28,8 @@ public class GameSession {
         return invincibleTicks > 0;
     }
 
-    public boolean shouldBlink() {
-        return invincibleTicks > 0 && (invincibleTicks / 5) % 2 == 0;
+    public int getInvincibleTicks() {
+        return invincibleTicks;
     }
 
     public void tickInvincibility() {

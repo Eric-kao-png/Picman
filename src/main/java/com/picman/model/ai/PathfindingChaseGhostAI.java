@@ -16,9 +16,4 @@ public class PathfindingChaseGhostAI extends ChaseDirectionSelector {
         int[][] distances = MazePathfinder.distancesFrom(maze, targetCol, targetRow);
         return (fromCol, fromRow) -> MazePathfinder.stepsTo(distances, fromCol, fromRow);
     }
-
-    @Override
-    protected int distanceToTarget(Maze maze, int fromCol, int fromRow, GridPosition target) {
-        return createEvaluator(maze, target).steps(fromCol, fromRow);
-    }
 }

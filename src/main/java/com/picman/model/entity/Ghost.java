@@ -4,8 +4,9 @@ import com.picman.config.GhostHouseConfig;
 import com.picman.config.GhostSpawn;
 import com.picman.model.Maze;
 import com.picman.model.ai.GhostAI;
+import com.picman.movement.GhostMover;
 import com.picman.movement.GridMath;
-import com.picman.movement.GridMovement;
+import com.picman.movement.TurnPlanner;
 import com.picman.util.Direction;
 
 import java.awt.Color;
@@ -64,6 +65,10 @@ public class Ghost {
         return position.getRow();
     }
 
+    public boolean isActiveForCollision() {
+        return mode != GhostMode.WAITING;
+    }
+
     public void update(Maze maze, Pacman pacman) {
         ensureOnWalkableTile(maze);
 
@@ -75,41 +80,18 @@ public class Ghost {
         }
     }
 
-    public boolean collidesWith(Pacman pacman) {
-        if (mode == GhostMode.WAITING) {
-            return false;
-        }
-        return com.picman.collision.CollisionDetector.entitiesOverlap(position, pacman.getPosition());
-    }
-
     private void updateLeaving(Maze maze) {
         direction = Direction.DOWN;
-        if (!GridMovement.canAdvance(maze, getCol(), getRow(), direction)) {
-            stopAtCurrentCell();
-            return;
-        }
-        if (!GridMovement.moveGhost(maze, position, direction)) {
-            stopAtCurrentCell();
-            return;
-        }
-        if (hasExitedHouse()) {
+        if (GhostMover.advance(maze, position, direction) && hasExitedHouse()) {
             mode = GhostMode.ACTIVE;
             direction = Direction.DOWN;
         }
     }
 
     private void updateActive(Maze maze, Pacman pacman) {
-        planDirectionAtCenter(maze, pacman);
-
-        if (direction == null) {
-            return;
-        }
-        if (!GridMovement.canAdvance(maze, getCol(), getRow(), direction)) {
-            stopAtCurrentCell();
-            return;
-        }
-        if (!GridMovement.moveGhost(maze, position, direction)) {
-            stopAtCurrentCell();
+        replanDirectionAtCenter(maze, pacman);
+        if (direction != null) {
+            GhostMover.advance(maze, position, direction);
         }
     }
 
@@ -125,26 +107,20 @@ public class Ghost {
         direction = mode == GhostMode.LEAVING ? Direction.DOWN : null;
     }
 
-    private void planDirectionAtCenter(Maze maze, Pacman pacman) {
+    private void replanDirectionAtCenter(Maze maze, Pacman pacman) {
         if (!GridMath.isAtCellCenter(position.getCenterX(), position.getCenterY())) {
             return;
         }
 
         int col = getCol();
         int row = getRow();
-        boolean blocked = direction != null && !GridMovement.canAdvance(maze, col, row, direction);
-        if (!blocked && direction != null && !maze.isIntersection(col, row)) {
+        if (!TurnPlanner.needsDirectionChoice(maze, col, row, direction)) {
             return;
         }
 
         direction = ai.chooseDirection(maze, col, row, direction, pacman.getPosition());
         if (direction == null) {
-            position.snapToCell(col, row);
+            GhostMover.snapToCell(position);
         }
-    }
-
-    private void stopAtCurrentCell() {
-        position.snapToCell(getCol(), getRow());
-        direction = null;
     }
 }

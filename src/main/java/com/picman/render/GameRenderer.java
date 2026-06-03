@@ -33,7 +33,7 @@ public class GameRenderer {
         hudRenderer.render(g, session);
         mazeRenderer.render(g, maze);
         entityRenderer.renderGhosts(g, ghosts);
-        entityRenderer.renderPacman(g, pacman, !session.shouldBlink());
+        entityRenderer.renderPacman(g, pacman, InvincibilityVisual.isPacmanVisible(session));
         overlayRenderer.render(g, session, maze, panelWidth, panelHeight);
     }
 }
