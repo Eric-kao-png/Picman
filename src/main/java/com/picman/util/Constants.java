@@ -20,8 +20,8 @@ public final class Constants {
 
     public static final int PACMAN_START_COL = 1;
     public static final int PACMAN_START_ROW = 1;
-    public static final int GHOST_START_COL = 10;
-    public static final int GHOST_START_ROW = 7;
+    public static final int GHOST_START_COL = 13;
+    public static final int GHOST_START_ROW = 11;
 
     public static final Color COLOR_BACKGROUND = new Color(0, 0, 0);
     public static final Color COLOR_WALL = new Color(33, 33, 222);
