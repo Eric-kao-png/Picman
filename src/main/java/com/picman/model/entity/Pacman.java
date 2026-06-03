@@ -11,11 +11,14 @@ public class Pacman {
             GameConfig.PACMAN_START_ROW);
     private Direction direction;
     private Direction activeDirection;
+    /** 最後一次有效的移動朝向（供粉色幽靈伏擊點計算）。 */
+    private Direction lastFacingDirection;
 
     public void reset() {
         position.snapToCell(GameConfig.PACMAN_START_COL, GameConfig.PACMAN_START_ROW);
         direction = null;
         activeDirection = null;
+        lastFacingDirection = null;
     }
 
     public GridPosition getPosition() {
@@ -31,20 +34,29 @@ public class Pacman {
     }
 
     /**
-     * 目前移動方向；靜止時改為玩家最後按下的方向（對應經典 Pinky 伏擊判定）。
+     * 記錄的朝向：優先目前移動方向，其次按鍵意圖，最後為曾經的面向。
      */
     public Direction getFacingDirection() {
         if (direction != null) {
             return direction;
         }
-        return activeDirection;
+        if (activeDirection != null) {
+            return activeDirection;
+        }
+        return lastFacingDirection;
     }
 
     public void setActiveDirection(Direction direction) {
         activeDirection = direction;
-        if (direction == null) {
+        if (direction != null) {
+            recordFacing(direction);
+        } else {
             this.direction = null;
         }
+    }
+
+    private void recordFacing(Direction facing) {
+        lastFacingDirection = facing;
     }
 
     public void update(Maze maze) {
@@ -64,10 +76,12 @@ public class Pacman {
     private void applyTurnIfPossible(Maze maze) {
         if (GridMovement.canTurn(position, direction, activeDirection, maze)) {
             direction = activeDirection;
+            recordFacing(direction);
             return;
         }
         if (direction == null && GridMovement.canTurn(position, null, activeDirection, maze)) {
             direction = activeDirection;
+            recordFacing(direction);
         }
     }
 }
