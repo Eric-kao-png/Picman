@@ -4,17 +4,19 @@ import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
 import com.picman.model.Maze;
 import com.picman.model.entity.Ghost;
+import com.picman.model.entity.GhostFactory;
 import com.picman.model.entity.Pacman;
 import com.picman.render.GameRenderer;
 import com.picman.render.ViewLayout;
 import com.picman.util.Direction;
 
 import java.awt.Graphics2D;
+import java.util.List;
 
 public class Game {
     private final Maze maze = new Maze();
     private final Pacman pacman = new Pacman();
-    private final Ghost ghost = new Ghost();
+    private final List<Ghost> ghosts = GhostFactory.createAll();
     private final GameSession session = new GameSession();
     private final GameRenderer renderer = new GameRenderer();
 
@@ -30,7 +32,9 @@ public class Game {
             session.onCoinCollected();
         }
 
-        ghost.update(maze, pacman);
+        for (Ghost ghost : ghosts) {
+            ghost.update(maze, pacman);
+        }
         handleGhostCollision();
 
         if (maze.noCoinsLeft()) {
@@ -39,7 +43,7 @@ public class Game {
     }
 
     public void render(Graphics2D g) {
-        renderer.render(g, maze, pacman, ghost, session);
+        renderer.render(g, maze, pacman, ghosts, session);
     }
 
     public void setActiveDirection(Direction direction) {
@@ -51,7 +55,7 @@ public class Game {
     public void restart() {
         maze.reset();
         pacman.reset();
-        ghost.reset();
+        ghosts.forEach(Ghost::reset);
         session.reset();
     }
 
@@ -68,14 +72,19 @@ public class Game {
     }
 
     private void handleGhostCollision() {
-        if (!ghost.collidesWith(pacman) || session.isInvincible()) {
+        if (session.isInvincible()) {
+            return;
+        }
+
+        boolean hit = ghosts.stream().anyMatch(ghost -> ghost.collidesWith(pacman));
+        if (!hit) {
             return;
         }
 
         session.onGhostHit();
         if (session.getStatus() == GameStatus.PLAYING) {
             pacman.reset();
-            ghost.reset();
+            ghosts.forEach(Ghost::reset);
         }
     }
 }

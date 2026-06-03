@@ -18,6 +18,12 @@ public class EntityRenderer {
         drawCircle(g, pacman.getPosition(), RenderTheme.PACMAN);
     }
 
+    public void renderGhosts(Graphics2D g, java.util.List<Ghost> ghosts) {
+        for (Ghost ghost : ghosts) {
+            renderGhost(g, ghost);
+        }
+    }
+
     public void renderGhost(Graphics2D g, Ghost ghost) {
         GridPosition position = ghost.getPosition();
         int x = (int) Math.round(position.getDrawX());
@@ -25,7 +31,7 @@ public class EntityRenderer {
         int margin = GameConfig.ENTITY_DRAW_MARGIN;
         int size = GameConfig.TILE_SIZE - margin * 2;
 
-        g.setColor(RenderTheme.GHOST);
+        g.setColor(ghost.getColor());
         g.fillRoundRect(x + margin, y + margin, size, size, ARC_SIZE, ARC_SIZE);
     }
 

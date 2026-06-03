@@ -18,8 +18,7 @@ public final class GameConfig {
 
     public static final int PACMAN_START_COL = 1;
     public static final int PACMAN_START_ROW = 1;
-    public static final int GHOST_START_COL = 13;
-    public static final int GHOST_START_ROW = 11;
+    public static final int GHOST_COUNT = 4;
 
     public static final double ENTITY_HIT_RADIUS_RATIO = 0.75;
     public static final int ENTITY_DRAW_MARGIN = 2;
