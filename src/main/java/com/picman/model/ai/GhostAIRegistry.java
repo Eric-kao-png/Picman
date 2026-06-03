@@ -6,6 +6,7 @@ package com.picman.model.ai;
 public final class GhostAIRegistry {
     public static final GhostAI PATHFINDING_CHASE = new PathfindingChaseGhostAI();
     public static final GhostAI PINK_AMBUSH_PATHFINDING = new PinkPathfindingGhostAI();
+    public static final GhostAI CYAN_INKY_PATHFINDING = new CyanPathfindingGhostAI();
     public static final GhostAI MANHATTAN_CHASE = new GhostChaseAI();
 
     private GhostAIRegistry() {

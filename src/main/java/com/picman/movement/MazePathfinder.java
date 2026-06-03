@@ -24,13 +24,21 @@ public final class MazePathfinder {
             Arrays.fill(row, UNREACHABLE);
         }
 
-        if (!maze.isWalkable(startCol, startRow)) {
+        if (!inBounds(maze, startCol, startRow)) {
             return distances;
         }
 
         Queue<int[]> queue = new ArrayDeque<>();
-        distances[startRow][startCol] = 0;
-        queue.add(new int[]{startCol, startRow});
+        if (maze.isWalkable(startCol, startRow)) {
+            distances[startRow][startCol] = 0;
+            queue.add(new int[]{startCol, startRow});
+        } else {
+            seedWalkableNeighbors(maze, distances, queue, startCol, startRow, 1);
+        }
+
+        if (queue.isEmpty()) {
+            return distances;
+        }
 
         while (!queue.isEmpty()) {
             int[] cell = queue.poll();
@@ -60,5 +68,37 @@ public final class MazePathfinder {
         }
         int steps = distances[row][col];
         return steps == UNREACHABLE ? Integer.MAX_VALUE : steps;
+    }
+
+    /**
+     * 計算各可走格到目標格的最短路徑步數；目標在牆上或界外時，從其可走鄰格開始擴展。
+     */
+    public static int[][] distancesToward(Maze maze, int targetCol, int targetRow) {
+        return distancesFrom(maze, targetCol, targetRow);
+    }
+
+    private static boolean inBounds(Maze maze, int col, int row) {
+        return col >= 0 && col < maze.getWidth() && row >= 0 && row < maze.getHeight();
+    }
+
+    private static void seedWalkableNeighbors(
+            Maze maze,
+            int[][] distances,
+            Queue<int[]> queue,
+            int col,
+            int row,
+            int initialSteps) {
+        for (Direction direction : Direction.values()) {
+            int nextCol = col + direction.dx;
+            int nextRow = row + direction.dy;
+            if (!inBounds(maze, nextCol, nextRow) || !maze.isWalkable(nextCol, nextRow)) {
+                continue;
+            }
+            if (distances[nextRow][nextCol] != UNREACHABLE) {
+                continue;
+            }
+            distances[nextRow][nextCol] = initialSteps;
+            queue.add(new int[]{nextCol, nextRow});
+        }
     }
 }

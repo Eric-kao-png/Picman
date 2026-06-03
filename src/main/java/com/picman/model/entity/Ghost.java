@@ -4,12 +4,14 @@ import com.picman.config.GhostHouseConfig;
 import com.picman.config.GhostSpawn;
 import com.picman.model.Maze;
 import com.picman.model.ai.GhostAI;
+import com.picman.model.ai.GhostAIContext;
 import com.picman.movement.GhostMover;
 import com.picman.movement.GridMath;
 import com.picman.movement.TurnPlanner;
 import com.picman.util.Direction;
 
 import java.awt.Color;
+import java.util.List;
 
 public class Ghost {
     private final int spawnCol;
@@ -69,14 +71,14 @@ public class Ghost {
         return mode != GhostMode.WAITING;
     }
 
-    public void update(Maze maze, Pacman pacman) {
+    public void update(Maze maze, Pacman pacman, List<Ghost> allGhosts) {
         ensureOnWalkableTile(maze);
 
         switch (mode) {
             case WAITING -> {
             }
             case LEAVING -> updateLeaving(maze);
-            case ACTIVE -> updateActive(maze, pacman);
+            case ACTIVE -> updateActive(maze, pacman, allGhosts);
         }
     }
 
@@ -88,8 +90,8 @@ public class Ghost {
         }
     }
 
-    private void updateActive(Maze maze, Pacman pacman) {
-        replanDirectionAtCenter(maze, pacman);
+    private void updateActive(Maze maze, Pacman pacman, List<Ghost> allGhosts) {
+        replanDirectionAtCenter(maze, pacman, allGhosts);
         if (direction != null) {
             GhostMover.advance(maze, position, direction);
         }
@@ -107,7 +109,7 @@ public class Ghost {
         direction = mode == GhostMode.LEAVING ? Direction.DOWN : null;
     }
 
-    private void replanDirectionAtCenter(Maze maze, Pacman pacman) {
+    private void replanDirectionAtCenter(Maze maze, Pacman pacman, List<Ghost> allGhosts) {
         if (!GridMath.isAtCellCenter(position.getCenterX(), position.getCenterY())) {
             return;
         }
@@ -118,7 +120,8 @@ public class Ghost {
             return;
         }
 
-        direction = ai.chooseDirection(maze, col, row, direction, pacman);
+        GhostAIContext context = new GhostAIContext(pacman, allGhosts);
+        direction = ai.chooseDirection(maze, col, row, direction, context);
         if (direction == null) {
             GhostMover.snapToCell(position);
         }

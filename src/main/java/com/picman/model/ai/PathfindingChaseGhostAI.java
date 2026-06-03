@@ -1,7 +1,6 @@
 package com.picman.model.ai;
 
 import com.picman.model.Maze;
-import com.picman.model.entity.Pacman;
 import com.picman.movement.GridMath;
 
 /**
@@ -9,9 +8,9 @@ import com.picman.movement.GridMath;
  */
 public class PathfindingChaseGhostAI extends ChaseDirectionSelector {
     @Override
-    protected DistanceEvaluator createEvaluator(Maze maze, Pacman pacman) {
-        int targetCol = GridMath.cellIndex(pacman.getPosition().getCenterX());
-        int targetRow = GridMath.cellIndex(pacman.getPosition().getCenterY());
+    protected DistanceEvaluator createEvaluator(Maze maze, GhostAIContext context) {
+        int targetCol = GridMath.cellIndex(context.pacman().getPosition().getCenterX());
+        int targetRow = GridMath.cellIndex(context.pacman().getPosition().getCenterY());
         return PathfindingEvaluatorFactory.toCell(maze, targetCol, targetRow);
     }
 }

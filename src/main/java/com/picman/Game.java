@@ -42,7 +42,7 @@ public class Game {
 
         ghostReleaseScheduler.tick(ghosts);
         for (Ghost ghost : ghosts) {
-            ghost.update(maze, pacman);
+            ghost.update(maze, pacman, ghosts);
         }
         collisionHandler.resolve(pacman, ghosts, session, ghostReleaseScheduler);
 
