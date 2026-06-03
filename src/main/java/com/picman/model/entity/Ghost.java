@@ -3,7 +3,7 @@ package com.picman.model.entity;
 import com.picman.config.GhostHouseConfig;
 import com.picman.config.GhostSpawn;
 import com.picman.model.Maze;
-import com.picman.model.ai.GhostChaseAI;
+import com.picman.model.ai.GhostAI;
 import com.picman.movement.GridMath;
 import com.picman.movement.GridMovement;
 import com.picman.util.Direction;
@@ -16,7 +16,7 @@ public class Ghost {
     private final Direction initialDirection;
     private final Color color;
     private final GridPosition position;
-    private final GhostChaseAI ai = new GhostChaseAI();
+    private final GhostAI ai;
 
     private GhostMode mode = GhostMode.WAITING;
     private Direction direction;
@@ -26,6 +26,7 @@ public class Ghost {
         this.spawnRow = spawn.row();
         this.initialDirection = spawn.initialDirection();
         this.color = spawn.color();
+        this.ai = spawn.ai();
         this.position = new GridPosition(spawnCol, spawnRow);
         this.direction = initialDirection;
     }

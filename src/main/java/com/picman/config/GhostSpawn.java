@@ -1,8 +1,9 @@
 package com.picman.config;
 
+import com.picman.model.ai.GhostAI;
 import com.picman.util.Direction;
 
 import java.awt.Color;
 
-public record GhostSpawn(int col, int row, Direction initialDirection, Color color) {
+public record GhostSpawn(int col, int row, Direction initialDirection, Color color, GhostAI ai) {
 }
