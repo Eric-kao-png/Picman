@@ -120,7 +120,7 @@ public class Ghost {
             return;
         }
 
-        GhostAIContext context = new GhostAIContext(pacman, allGhosts);
+        GhostAIContext context = GhostAIContext.of(pacman, allGhosts);
         direction = ai.chooseDirection(maze, col, row, direction, context);
         if (direction == null) {
             GhostMover.snapToCell(position);

@@ -70,13 +70,6 @@ public final class MazePathfinder {
         return steps == UNREACHABLE ? Integer.MAX_VALUE : steps;
     }
 
-    /**
-     * 計算各可走格到目標格的最短路徑步數；目標在牆上或界外時，從其可走鄰格開始擴展。
-     */
-    public static int[][] distancesToward(Maze maze, int targetCol, int targetRow) {
-        return distancesFrom(maze, targetCol, targetRow);
-    }
-
     private static boolean inBounds(Maze maze, int col, int row) {
         return col >= 0 && col < maze.getWidth() && row >= 0 && row < maze.getHeight();
     }

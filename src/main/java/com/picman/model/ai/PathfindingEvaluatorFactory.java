@@ -11,7 +11,7 @@ final class PathfindingEvaluatorFactory {
     }
 
     static ChaseDirectionSelector.DistanceEvaluator toCell(Maze maze, int targetCol, int targetRow) {
-        int[][] distances = MazePathfinder.distancesToward(maze, targetCol, targetRow);
+        int[][] distances = MazePathfinder.distancesFrom(maze, targetCol, targetRow);
         return (fromCol, fromRow) -> MazePathfinder.stepsTo(distances, fromCol, fromRow);
     }
 }
