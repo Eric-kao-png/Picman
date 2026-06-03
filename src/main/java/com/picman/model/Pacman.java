@@ -71,22 +71,8 @@ public class Pacman {
         }
 
         double[] center = {centerX, centerY};
-        MovementHelper.alignInCorridor(center, direction, Constants.PACMAN_SPEED);
+        MovementHelper.moveOnGrid(maze, center, direction, Constants.PACMAN_SPEED);
         centerX = center[0];
         centerY = center[1];
-
-        double nextX = centerX + direction.dx * Constants.PACMAN_SPEED;
-        double nextY = centerY + direction.dy * Constants.PACMAN_SPEED;
-
-        if (MovementHelper.canMoveTo(maze, centerX, centerY, direction, Constants.PACMAN_SPEED)) {
-            centerX = nextX;
-            centerY = nextY;
-        } else {
-            center[0] = centerX;
-            center[1] = centerY;
-            MovementHelper.clampAtWall(center, direction);
-            centerX = center[0];
-            centerY = center[1];
-        }
     }
 }

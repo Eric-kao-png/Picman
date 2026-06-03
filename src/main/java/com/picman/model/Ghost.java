@@ -4,12 +4,10 @@ import com.picman.util.Constants;
 import com.picman.util.Direction;
 import com.picman.util.MovementHelper;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Ghost {
-    private static final Random RANDOM = new Random();
-
     private final int spawnCol;
     private final int spawnRow;
 
@@ -54,31 +52,48 @@ public class Ghost {
     }
 
     public void update(Maze maze, Pacman pacman) {
-        if (MovementHelper.isPerpendicularAligned(centerX, centerY, direction)) {
-            chooseDirection(maze, pacman);
+        int col = getCol();
+        int row = getRow();
+
+        if (!maze.isWalkable(col, row)) {
+            double[] center = {centerX, centerY};
+            MovementHelper.snapToCellCenter(center, spawnCol, spawnRow);
+            centerX = center[0];
+            centerY = center[1];
+            direction = Direction.LEFT;
+            return;
+        }
+
+        boolean atCenter = MovementHelper.isAtCellCenter(centerX, centerY);
+        boolean blocked = direction != null && !MovementHelper.canAdvance(maze, col, row, direction);
+
+        if (atCenter) {
+            if (blocked || direction == null || isIntersection(maze, col, row)) {
+                direction = pickDirection(maze, pacman, col, row);
+            }
         }
 
         if (direction == null) {
+            snapToGridCenter(col, row);
+            return;
+        }
+
+        if (!MovementHelper.canAdvance(maze, col, row, direction)) {
+            snapToGridCenter(col, row);
+            direction = null;
             return;
         }
 
         double[] center = {centerX, centerY};
-        MovementHelper.alignInCorridor(center, direction, Constants.GHOST_SPEED);
+        boolean moved = MovementHelper.moveOnGridForGhost(maze, center, direction, Constants.GHOST_SPEED);
         centerX = center[0];
         centerY = center[1];
 
-        double nextX = centerX + direction.dx * Constants.GHOST_SPEED;
-        double nextY = centerY + direction.dy * Constants.GHOST_SPEED;
-
-        if (MovementHelper.canMoveTo(maze, centerX, centerY, direction, Constants.GHOST_SPEED)) {
-            centerX = nextX;
-            centerY = nextY;
-        } else {
-            center[0] = centerX;
-            center[1] = centerY;
-            MovementHelper.clampAtWall(center, direction);
-            centerX = center[0];
-            centerY = center[1];
+        if (!moved) {
+            col = getCol();
+            row = getRow();
+            snapToGridCenter(col, row);
+            direction = null;
         }
     }
 
@@ -89,33 +104,75 @@ public class Ghost {
         return dx * dx + dy * dy <= hitRadius * hitRadius;
     }
 
-    private void chooseDirection(Maze maze, Pacman pacman) {
-        List<Direction> options = maze.getValidDirections(getCol(), getRow(), direction, true);
-        if (options.isEmpty()) {
-            return;
+    private Direction pickDirection(Maze maze, Pacman pacman, int col, int row) {
+        List<Direction> options = new ArrayList<>();
+        for (Direction dir : Direction.values()) {
+            if (maze.isWalkable(col + dir.dx, row + dir.dy)) {
+                options.add(dir);
+            }
         }
+
+        if (options.isEmpty()) {
+            return null;
+        }
+
         if (options.size() == 1) {
-            direction = options.get(0);
-            return;
+            return options.get(0);
+        }
+
+        if (direction != null && options.contains(direction) && MovementHelper.canAdvance(maze, col, row, direction)) {
+            if (!isIntersection(maze, col, row)) {
+                return direction;
+            }
         }
 
         int targetCol = pacman.getCol();
         int targetRow = pacman.getRow();
 
-        Direction best = options.get(0);
-        int bestDistance = manhattan(getCol() + best.dx, getRow() + best.dy, targetCol, targetRow);
+        List<Direction> bestOptions = new ArrayList<>();
+        int bestDistance = Integer.MAX_VALUE;
 
-        for (int i = 1; i < options.size(); i++) {
-            Direction candidate = options.get(i);
-            int distance = manhattan(getCol() + candidate.dx, getRow() + candidate.dy, targetCol, targetRow);
+        for (Direction candidate : options) {
+            int distance = manhattan(col + candidate.dx, row + candidate.dy, targetCol, targetRow);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                best = candidate;
-            } else if (distance == bestDistance && RANDOM.nextBoolean()) {
-                best = candidate;
+                bestOptions.clear();
+                bestOptions.add(candidate);
+            } else if (distance == bestDistance) {
+                bestOptions.add(candidate);
             }
         }
-        direction = best;
+
+        if (bestOptions.isEmpty()) {
+            return null;
+        }
+
+        if (direction != null && bestOptions.contains(direction)) {
+            return direction;
+        }
+
+        if (bestOptions.size() == 1) {
+            return bestOptions.get(0);
+        }
+
+        return bestOptions.get(0);
+    }
+
+    private boolean isIntersection(Maze maze, int col, int row) {
+        int walkableNeighbors = 0;
+        for (Direction dir : Direction.values()) {
+            if (maze.isWalkable(col + dir.dx, row + dir.dy)) {
+                walkableNeighbors++;
+            }
+        }
+        return walkableNeighbors > 2;
+    }
+
+    private void snapToGridCenter(int col, int row) {
+        double[] center = {centerX, centerY};
+        MovementHelper.snapToCellCenter(center, col, row);
+        centerX = center[0];
+        centerY = center[1];
     }
 
     private static int manhattan(int x1, int y1, int x2, int y2) {
