@@ -54,7 +54,26 @@ public class Maze {
             grid[row][col] = CellType.EMPTY.getCode();
             return CollectibleType.POWER_COIN;
         }
+        if (cell == CellType.EXTRA_LIFE_ITEM) {
+            grid[row][col] = CellType.EMPTY.getCode();
+            return CollectibleType.EXTRA_LIFE_ITEM;
+        }
         return CollectibleType.NONE;
+    }
+
+    public boolean placeSpawnedItem(int col, int row, CellType itemType) {
+        if (!inBounds(col, row) || getCellType(col, row) != CellType.EMPTY) {
+            return false;
+        }
+        grid[row][col] = itemType.getCode();
+        return true;
+    }
+
+    public void clearSpawnedItem(int col, int row) {
+        if (!inBounds(col, row) || getCellType(col, row) != CellType.EXTRA_LIFE_ITEM) {
+            return;
+        }
+        grid[row][col] = CellType.EMPTY.getCode();
     }
 
     /** 僅計算普通金幣；大金幣不影響過關條件。 */

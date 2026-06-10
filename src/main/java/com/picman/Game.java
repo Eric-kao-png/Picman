@@ -1,6 +1,7 @@
 package com.picman;
 
 import com.picman.game.GameCollisionHandler;
+import com.picman.game.ItemSpawnScheduler;
 import com.picman.model.CollectibleType;
 import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
@@ -24,9 +25,11 @@ public class Game {
     private final GameSession session = new GameSession();
     private final GameRenderer renderer = new GameRenderer();
     private final GameCollisionHandler collisionHandler = new GameCollisionHandler();
+    private final ItemSpawnScheduler itemSpawnScheduler = new ItemSpawnScheduler();
 
     public Game() {
         ghostReleaseScheduler.reset(ghosts);
+        itemSpawnScheduler.reset();
     }
 
     public void update() {
@@ -40,6 +43,7 @@ public class Game {
         session.tickPowered();
         pacman.update(maze);
 
+        itemSpawnScheduler.tick(maze, session);
         handleCollectibleAtPacman();
 
         if (!wasPowered && session.isPowered()) {
@@ -64,6 +68,10 @@ public class Game {
         switch (collected) {
             case COIN -> session.onCoinCollected();
             case POWER_COIN -> session.onPowerCoinCollected();
+            case EXTRA_LIFE_ITEM -> {
+                session.onExtraLifeCollected();
+                itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
+            }
             case NONE -> {
             }
         }
@@ -83,6 +91,7 @@ public class Game {
         maze.reset();
         pacman.reset();
         ghostReleaseScheduler.reset(ghosts);
+        itemSpawnScheduler.reset();
         session.reset();
     }
 

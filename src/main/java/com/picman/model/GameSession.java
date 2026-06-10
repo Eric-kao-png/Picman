@@ -1,6 +1,7 @@
 package com.picman.model;
 
 import com.picman.config.GameConfig;
+import com.picman.config.ItemSpawnConfig;
 import com.picman.config.PowerCoinConfig;
 
 public class GameSession {
@@ -65,6 +66,12 @@ public class GameSession {
 
     public void onGhostEaten() {
         addScore(PowerCoinConfig.SCORE);
+    }
+
+    public void onExtraLifeCollected() {
+        if (lives < ItemSpawnConfig.MAX_LIVES) {
+            lives++;
+        }
     }
 
     public void onGhostHit() {
