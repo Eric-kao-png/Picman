@@ -24,7 +24,21 @@ public class GamePanel extends JPanel {
         addKeyListener(new GameKeyBindings(game, keyboardInput));
 
         timer = new Timer(GameConfig.TICK_MS, e -> tick());
-        timer.start();
+    }
+
+    public void startGame() {
+        game.restart();
+        keyboardInput.clear();
+        if (!timer.isRunning()) {
+            timer.start();
+        }
+        requestFocusInWindow();
+    }
+
+    public void stopGame() {
+        if (timer.isRunning()) {
+            timer.stop();
+        }
     }
 
     @Override
