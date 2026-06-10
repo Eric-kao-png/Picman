@@ -14,7 +14,6 @@ public class GameRenderer {
     private final HudRenderer hudRenderer = new HudRenderer();
     private final MazeRenderer mazeRenderer = new MazeRenderer();
     private final EntityRenderer entityRenderer = new EntityRenderer();
-    private final OverlayRenderer overlayRenderer = new OverlayRenderer();
 
     public void render(
             Graphics2D g,
@@ -34,6 +33,5 @@ public class GameRenderer {
         mazeRenderer.render(g, maze);
         entityRenderer.renderGhosts(g, ghosts);
         entityRenderer.renderPacman(g, pacman, InvincibilityVisual.isPacmanVisible(session));
-        overlayRenderer.render(g, session, maze, panelWidth, panelHeight);
     }
 }
