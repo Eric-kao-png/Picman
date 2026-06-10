@@ -1,8 +1,8 @@
 package com.picman.model.ai;
 
-import com.picman.model.entity.GhostDefinitions;
+import com.picman.model.entity.GhostKind;
 import com.picman.model.entity.Pacman;
-import com.picman.model.entity.Ghost.Ghost;
+import com.picman.model.entity.ghost.Ghost;
 
 import java.util.List;
 
@@ -15,6 +15,6 @@ public record GhostAIContext(Pacman pacman, List<Ghost> ghosts) {
     }
 
     public Ghost redGhost() {
-        return ghosts.get(GhostDefinitions.RED_GHOST_INDEX);
+        return ghosts.get(GhostKind.RED.index());
     }
 }

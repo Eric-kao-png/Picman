@@ -1,8 +1,8 @@
 package com.picman;
 
-import com.picman.config.RenderTheme;
 import com.picman.render.DecorativeSprites;
 import com.picman.render.UiDraw;
+import com.picman.ui.MenuTheme;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -11,7 +11,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -24,26 +23,6 @@ public class MenuPanel extends JPanel {
         HELP
     }
 
-    private static final Color MENU_BACKGROUND = new Color(3, 5, 18);
-    private static final Color NEON_BLUE = new Color(64, 158, 255);
-    private static final Color DEEP_BLUE = new Color(7, 17, 55);
-    private static final Color BUTTON_BLUE = new Color(10, 30, 92);
-    private static final Color BUTTON_HOVER = new Color(28, 95, 210);
-    private static final Color MENU_YELLOW = RenderTheme.PACMAN;
-    private static final Color TEXT_WHITE = new Color(245, 248, 255);
-    private static final Color MUTED_TEXT = new Color(178, 204, 255);
-    private static final Color PELLET_COLOR = new Color(255, 236, 170);
-
-    private static final Font TITLE_FONT = new Font("Arial Black", Font.BOLD, 48);
-    private static final Font HELP_TITLE_FONT = new Font("SansSerif", Font.BOLD, 34);
-    private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 18);
-    private static final Font HELP_FONT = new Font("SansSerif", Font.BOLD, 18);
-    private static final Font HINT_FONT = new Font("SansSerif", Font.PLAIN, 13);
-
-    private static final int BUTTON_WIDTH = 230;
-    private static final int BUTTON_HEIGHT = 46;
-    private static final int BUTTON_GAP = 14;
-
     private final JButton startButton;
     private final JButton helpButton;
     private final JButton exitButton;
@@ -54,7 +33,7 @@ public class MenuPanel extends JPanel {
 
     public MenuPanel(int width, int height, Runnable onStartGame, Runnable onExitGame) {
         setPreferredSize(new Dimension(width, height));
-        setBackground(MENU_BACKGROUND);
+        setBackground(MenuTheme.BACKGROUND);
         setLayout(null);
         setFocusable(true);
 
@@ -132,31 +111,31 @@ public class MenuPanel extends JPanel {
     }
 
     private void layoutMainButtons() {
-        int x = (getWidth() - BUTTON_WIDTH) / 2;
-        int totalHeight = BUTTON_HEIGHT * 3 + BUTTON_GAP * 2;
+        int x = (getWidth() - MenuTheme.BUTTON_WIDTH) / 2;
+        int totalHeight = MenuTheme.BUTTON_HEIGHT * 3 + MenuTheme.BUTTON_GAP * 2;
         int y = Math.max(276, getHeight() - totalHeight - 58);
 
-        startButton.setBounds(x, y, BUTTON_WIDTH, BUTTON_HEIGHT);
-        helpButton.setBounds(x, y + BUTTON_HEIGHT + BUTTON_GAP, BUTTON_WIDTH, BUTTON_HEIGHT);
-        exitButton.setBounds(x, y + (BUTTON_HEIGHT + BUTTON_GAP) * 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+        startButton.setBounds(x, y, MenuTheme.BUTTON_WIDTH, MenuTheme.BUTTON_HEIGHT);
+        helpButton.setBounds(x, y + MenuTheme.BUTTON_HEIGHT + MenuTheme.BUTTON_GAP, MenuTheme.BUTTON_WIDTH, MenuTheme.BUTTON_HEIGHT);
+        exitButton.setBounds(x, y + (MenuTheme.BUTTON_HEIGHT + MenuTheme.BUTTON_GAP) * 2, MenuTheme.BUTTON_WIDTH, MenuTheme.BUTTON_HEIGHT);
     }
 
     private void layoutHelpButtons() {
-        int x = (getWidth() - BUTTON_WIDTH) / 2;
-        int totalHeight = BUTTON_HEIGHT * 2 + BUTTON_GAP;
+        int x = (getWidth() - MenuTheme.BUTTON_WIDTH) / 2;
+        int totalHeight = MenuTheme.BUTTON_HEIGHT * 2 + MenuTheme.BUTTON_GAP;
         int y = Math.max(330, getHeight() - totalHeight - 62);
 
-        helpStartButton.setBounds(x, y, BUTTON_WIDTH, BUTTON_HEIGHT);
-        backButton.setBounds(x, y + BUTTON_HEIGHT + BUTTON_GAP, BUTTON_WIDTH, BUTTON_HEIGHT);
+        helpStartButton.setBounds(x, y, MenuTheme.BUTTON_WIDTH, MenuTheme.BUTTON_HEIGHT);
+        backButton.setBounds(x, y + MenuTheme.BUTTON_HEIGHT + MenuTheme.BUTTON_GAP, MenuTheme.BUTTON_WIDTH, MenuTheme.BUTTON_HEIGHT);
     }
 
     private JButton createMenuButton(String text, boolean primary) {
         JButton button = new JButton(text);
-        button.setFont(BUTTON_FONT);
-        button.setForeground(primary ? MENU_YELLOW : TEXT_WHITE);
-        button.setBackground(BUTTON_BLUE);
+        button.setFont(MenuTheme.BUTTON_FONT);
+        button.setForeground(primary ? MenuTheme.MENU_YELLOW : MenuTheme.TEXT_WHITE);
+        button.setBackground(MenuTheme.BUTTON_BLUE);
         button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(primary ? MENU_YELLOW : NEON_BLUE, 2),
+                BorderFactory.createLineBorder(primary ? MenuTheme.MENU_YELLOW : MenuTheme.NEON_BLUE, 2),
                 BorderFactory.createEmptyBorder(8, 24, 8, 24)
         ));
         button.setFocusPainted(false);
@@ -165,20 +144,20 @@ public class MenuPanel extends JPanel {
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(BUTTON_HOVER);
+                button.setBackground(MenuTheme.BUTTON_HOVER);
                 button.setForeground(Color.WHITE);
                 button.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(MENU_YELLOW, 2),
+                        BorderFactory.createLineBorder(MenuTheme.MENU_YELLOW, 2),
                         BorderFactory.createEmptyBorder(8, 24, 8, 24)
                 ));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setForeground(primary ? MENU_YELLOW : TEXT_WHITE);
-                button.setBackground(BUTTON_BLUE);
+                button.setForeground(primary ? MenuTheme.MENU_YELLOW : MenuTheme.TEXT_WHITE);
+                button.setBackground(MenuTheme.BUTTON_BLUE);
                 button.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(primary ? MENU_YELLOW : NEON_BLUE, 2),
+                        BorderFactory.createLineBorder(primary ? MenuTheme.MENU_YELLOW : MenuTheme.NEON_BLUE, 2),
                         BorderFactory.createEmptyBorder(8, 24, 8, 24)
                 ));
             }
@@ -192,12 +171,12 @@ public class MenuPanel extends JPanel {
         int pacmanX = centerX - pacmanSize / 2;
         int pacmanY = Math.max(52, getHeight() / 10);
 
-        DecorativeSprites.drawMenuPacman(g2, pacmanX, pacmanY, pacmanSize, MENU_YELLOW, MENU_BACKGROUND);
-        UiDraw.drawCenteredText(g2, "PAC-MAN", TITLE_FONT, MENU_YELLOW, centerX, pacmanY + pacmanSize + 54);
-        UiDraw.drawCenteredText(g2, "READY!", HINT_FONT, MUTED_TEXT, centerX, pacmanY + pacmanSize + 82);
+        DecorativeSprites.drawMenuPacman(g2, pacmanX, pacmanY, pacmanSize, MenuTheme.MENU_YELLOW, MenuTheme.BACKGROUND);
+        UiDraw.drawCenteredText(g2, "PAC-MAN", MenuTheme.TITLE_FONT, MenuTheme.MENU_YELLOW, centerX, pacmanY + pacmanSize + 54);
+        UiDraw.drawCenteredText(g2, "READY!", MenuTheme.HINT_FONT, MenuTheme.MUTED_TEXT, centerX, pacmanY + pacmanSize + 82);
 
         int dotY = Math.min(getHeight() - 252, pacmanY + pacmanSize + 114);
-        DecorativeSprites.drawPelletLine(g2, 58, getWidth() - 58, dotY, PELLET_COLOR);
+        DecorativeSprites.drawPelletLine(g2, 58, getWidth() - 58, dotY, MenuTheme.PELLET);
         DecorativeSprites.drawSmallGhost(g2, getWidth() - 96, dotY - 21, new Color(255, 76, 76));
         DecorativeSprites.drawSmallGhost(g2, 66, dotY - 21, new Color(0, 220, 255));
     }
@@ -206,8 +185,8 @@ public class MenuPanel extends JPanel {
         int centerX = getWidth() / 2;
         int titleY = Math.max(92, getHeight() / 5);
 
-        UiDraw.drawCenteredText(g2, "遊戲說明", HELP_TITLE_FONT, MENU_YELLOW, centerX, titleY);
-        DecorativeSprites.drawPelletLine(g2, 96, getWidth() - 96, titleY + 34, PELLET_COLOR);
+        UiDraw.drawCenteredText(g2, "遊戲說明", MenuTheme.HELP_TITLE_FONT, MenuTheme.MENU_YELLOW, centerX, titleY);
+        DecorativeSprites.drawPelletLine(g2, 96, getWidth() - 96, titleY + 34, MenuTheme.PELLET);
 
         String[] rules = {
                 "1. 使用方向鍵移動",
@@ -215,26 +194,26 @@ public class MenuPanel extends JPanel {
                 "3. 避開鬼魂"
         };
 
-        g2.setFont(HELP_FONT);
+        g2.setFont(MenuTheme.HELP_FONT);
         int lineHeight = g2.getFontMetrics().getHeight() + 13;
         int firstLineY = titleY + 92;
 
         for (int i = 0; i < rules.length; i++) {
-            UiDraw.drawCenteredText(g2, rules[i], HELP_FONT, TEXT_WHITE, centerX, firstLineY + i * lineHeight);
+            UiDraw.drawCenteredText(g2, rules[i], MenuTheme.HELP_FONT, MenuTheme.TEXT_WHITE, centerX, firstLineY + i * lineHeight);
         }
 
         int iconSize = 34;
         DecorativeSprites.drawMenuPacman(
-                g2, centerX - 72, firstLineY + lineHeight * rules.length + 18, iconSize, MENU_YELLOW, MENU_BACKGROUND);
+                g2, centerX - 72, firstLineY + lineHeight * rules.length + 18, iconSize, MenuTheme.MENU_YELLOW, MenuTheme.BACKGROUND);
         DecorativeSprites.drawSmallGhost(
                 g2, centerX + 38, firstLineY + lineHeight * rules.length + 16, new Color(255, 105, 180));
     }
 
     private void drawMazeBackground(Graphics2D g2) {
-        g2.setColor(DEEP_BLUE);
+        g2.setColor(MenuTheme.DEEP_BLUE);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
-        g2.setColor(new Color(15, 36, 110));
+        g2.setColor(MenuTheme.MAZE_LINE);
         g2.setStroke(new BasicStroke(2f));
 
         int margin = 38;
@@ -255,11 +234,11 @@ public class MenuPanel extends JPanel {
         int height = getHeight() - margin * 2;
 
         g2.setStroke(new BasicStroke(5f));
-        g2.setColor(new Color(20, 64, 180));
+        g2.setColor(MenuTheme.FRAME_OUTER);
         g2.drawRoundRect(margin, margin, width, height, 18, 18);
 
         g2.setStroke(new BasicStroke(2f));
-        g2.setColor(NEON_BLUE);
+        g2.setColor(MenuTheme.NEON_BLUE);
         g2.drawRoundRect(margin + 8, margin + 8, width - 16, height - 16, 14, 14);
     }
 }

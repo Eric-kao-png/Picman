@@ -5,6 +5,7 @@ import com.picman.util.Direction;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.ToIntBiFunction;
 import java.util.function.ToIntFunction;
 
@@ -21,7 +22,11 @@ final class DirectionRanker {
             List<Direction> options,
             ToIntBiFunction<Integer, Integer> scoreAtCell,
             Direction currentDirection) {
-        return selectByCell(col, row, options, scoreAtCell, currentDirection, Comparator.naturalOrder());
+        return selectBest(
+                options,
+                candidate -> scoreAtCell.applyAsInt(col + candidate.dx, row + candidate.dy),
+                currentDirection,
+                Comparator.naturalOrder());
     }
 
     static Direction selectMaximumByDirection(
@@ -30,42 +35,23 @@ final class DirectionRanker {
             List<Direction> options,
             ToIntFunction<Direction> scoreForDirection,
             Direction currentDirection) {
-        return selectByDirection(options, scoreForDirection, currentDirection, Comparator.reverseOrder());
+        return selectBest(
+                options,
+                scoreForDirection::applyAsInt,
+                currentDirection,
+                Comparator.reverseOrder());
     }
 
-    private static Direction selectByCell(
-            int col,
-            int row,
+    private static Direction selectBest(
             List<Direction> options,
-            ToIntBiFunction<Integer, Integer> scoreAtCell,
+            Function<Direction, Integer> scoreForOption,
             Direction currentDirection,
             Comparator<Integer> scoreOrder) {
         List<Direction> bestOptions = new ArrayList<>();
         Integer bestScore = null;
 
         for (Direction candidate : options) {
-            int score = scoreAtCell.applyAsInt(col + candidate.dx, row + candidate.dy);
-            if (bestScore == null || scoreOrder.compare(score, bestScore) < 0) {
-                bestScore = score;
-                bestOptions.clear();
-                bestOptions.add(candidate);
-            } else if (scoreOrder.compare(score, bestScore) == 0) {
-                bestOptions.add(candidate);
-            }
-        }
-        return pickBest(bestOptions, currentDirection);
-    }
-
-    private static Direction selectByDirection(
-            List<Direction> options,
-            ToIntFunction<Direction> scoreForDirection,
-            Direction currentDirection,
-            Comparator<Integer> scoreOrder) {
-        List<Direction> bestOptions = new ArrayList<>();
-        Integer bestScore = null;
-
-        for (Direction candidate : options) {
-            int score = scoreForDirection.applyAsInt(candidate);
+            int score = scoreForOption.apply(candidate);
             if (bestScore == null || scoreOrder.compare(score, bestScore) < 0) {
                 bestScore = score;
                 bestOptions.clear();

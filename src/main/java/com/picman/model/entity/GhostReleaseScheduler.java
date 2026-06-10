@@ -2,7 +2,7 @@ package com.picman.model.entity;
 
 import com.picman.config.GhostHouseConfig;
 import com.picman.config.PowerCoinConfig;
-import com.picman.model.entity.Ghost.Ghost;
+import com.picman.model.entity.ghost.Ghost;
 
 import java.util.ArrayDeque;
 import java.util.List;

@@ -51,10 +51,7 @@ public class GamePanel extends JPanel {
     }
 
     public void startGame() {
-        game.restart();
-        keyboardInput.clear();
-        resetGameOverAnimation();
-        hideGameOverButtons();
+        resetSessionState();
         if (!timer.isRunning()) {
             timer.start();
         }
@@ -137,21 +134,22 @@ public class GamePanel extends JPanel {
     }
 
     private void restartGame() {
-        game.restart();
-        keyboardInput.clear();
-        resetGameOverAnimation();
-        hideGameOverButtons();
+        resetSessionState();
         repaint();
         requestFocusInWindow();
     }
 
     private void returnToMainMenu() {
+        resetSessionState();
+        repaint();
+        onReturnToMenu.run();
+    }
+
+    private void resetSessionState() {
         game.restart();
         keyboardInput.clear();
         resetGameOverAnimation();
         hideGameOverButtons();
-        repaint();
-        onReturnToMenu.run();
     }
 
     private GameOverButton createGameOverButton(String text, boolean primary) {

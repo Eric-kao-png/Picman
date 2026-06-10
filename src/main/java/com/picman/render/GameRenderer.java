@@ -4,7 +4,7 @@ import com.picman.config.RenderTheme;
 import com.picman.model.GameSession;
 import com.picman.model.Maze;
 import com.picman.model.entity.Pacman;
-import com.picman.model.entity.Ghost.Ghost;
+import com.picman.model.entity.ghost.Ghost;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

@@ -1,4 +1,4 @@
-package com.picman.model.entity.Ghost;
+package com.picman.model.entity.ghost;
 
 import com.picman.model.Maze;
 import com.picman.model.entity.GhostMode;

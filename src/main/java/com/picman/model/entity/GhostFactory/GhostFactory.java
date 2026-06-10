@@ -1,9 +1,7 @@
-package com.picman.model.entity.GhostFactory;
+package com.picman.model.entity.ghostfactory;
 
-import com.picman.model.entity.Ghost.Ghost;
+import com.picman.model.entity.ghost.Ghost;
 
 public interface GhostFactory {
     Ghost createGhost();
 }
-
-

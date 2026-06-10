@@ -11,8 +11,6 @@ import java.util.List;
  * 關卡內幽靈生成定義（由靠近出口到深處排列）。
  */
 public final class GhostDefinitions {
-    public static final int RED_GHOST_INDEX = 0;    // 紅色幽靈在 ALL 中的索引
-
     public static final List<GhostSpawn> ALL = List.of(
             new GhostSpawn(14, 15, Direction.DOWN, RenderTheme.GHOST_RED, GhostAIRegistry.PATHFINDING_CHASE),
             new GhostSpawn(14, 14, Direction.DOWN, RenderTheme.GHOST_PINK, GhostAIRegistry.PINK_AMBUSH_PATHFINDING),

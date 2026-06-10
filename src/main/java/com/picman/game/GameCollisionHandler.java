@@ -5,7 +5,7 @@ import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
 import com.picman.model.entity.GhostReleaseScheduler;
 import com.picman.model.entity.Pacman;
-import com.picman.model.entity.Ghost.Ghost;
+import com.picman.model.entity.ghost.Ghost;
 
 import java.util.List;
 

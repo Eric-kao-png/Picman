@@ -8,11 +8,8 @@ import com.picman.model.GameStatus;
 import com.picman.model.Maze;
 import com.picman.model.entity.GhostReleaseScheduler;
 import com.picman.model.entity.Pacman;
-import com.picman.model.entity.Ghost.Ghost;
-import com.picman.model.entity.GhostFactory.Cyan_GhostFactory;
-import com.picman.model.entity.GhostFactory.Orange_GhostFactory;
-import com.picman.model.entity.GhostFactory.Pink_GhostFactory;
-import com.picman.model.entity.GhostFactory.Red_GhostFactory;
+import com.picman.model.entity.ghost.Ghost;
+import com.picman.model.entity.ghostfactory.GhostAssembly;
 import com.picman.render.GameRenderer;
 import com.picman.render.ViewLayout;
 import com.picman.movement.GridMovement;
@@ -24,11 +21,7 @@ import java.util.List;
 public class Game {
     private final Maze maze = new Maze();
     private final Pacman pacman = new Pacman();
-    private final List<Ghost> ghosts = List.of(
-            new Red_GhostFactory().createGhost(),
-            new Pink_GhostFactory().createGhost(),
-            new Cyan_GhostFactory().createGhost(),
-            new Orange_GhostFactory().createGhost());
+    private final List<Ghost> ghosts = GhostAssembly.createAll();
     private final GhostReleaseScheduler ghostReleaseScheduler = new GhostReleaseScheduler();
     private final GameSession session = new GameSession();
     private final GameRenderer renderer = new GameRenderer();
