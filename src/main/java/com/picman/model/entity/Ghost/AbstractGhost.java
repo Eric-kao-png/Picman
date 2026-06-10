@@ -1,11 +1,15 @@
-package com.picman.model.entity;
+package com.picman.model.entity.Ghost;
 
 import com.picman.config.GhostHouseConfig;
 import com.picman.config.GhostSpawn;
+import com.picman.config.RenderTheme;
 import com.picman.model.Maze;
 import com.picman.model.ai.GhostAI;
 import com.picman.model.ai.GhostAIContext;
 import com.picman.model.ai.GhostAIRegistry;
+import com.picman.model.entity.GhostMode;
+import com.picman.model.entity.GridPosition;
+import com.picman.model.entity.Pacman;
 import com.picman.movement.GhostMover;
 import com.picman.movement.GridMath;
 import com.picman.movement.TurnPlanner;
@@ -14,7 +18,7 @@ import com.picman.util.Direction;
 import java.awt.Color;
 import java.util.List;
 
-public class Ghost {
+abstract class AbstractGhost implements Ghost {
     private final int spawnCol;
     private final int spawnRow;
     private final Direction initialDirection;
@@ -27,7 +31,7 @@ public class Ghost {
     private Direction direction;
     private boolean pendingRespawn;
 
-    public Ghost(GhostSpawn spawn) {
+    protected AbstractGhost(GhostSpawn spawn) {
         this.spawnCol = spawn.col();
         this.spawnRow = spawn.row();
         this.initialDirection = spawn.initialDirection();
@@ -37,17 +41,20 @@ public class Ghost {
         this.direction = initialDirection;
     }
 
+    @Override
     public void enterHouse() {
         position.snapToCell(spawnCol, spawnRow);
         direction = null;
         mode = GhostMode.WAITING;
     }
 
+    @Override
     public void reset() {
         pendingRespawn = false;
         enterHouse();
     }
 
+    @Override
     public void releaseFromHouse() {
         if (mode == GhostMode.WAITING) {
             mode = GhostMode.LEAVING;
@@ -56,61 +63,72 @@ public class Ghost {
         }
     }
 
+    @Override
     public Color getColor() {
         return color;
     }
 
+    @Override
     public Color getDisplayColor() {
-        return mode == GhostMode.FRIGHTENED
-                ? com.picman.config.RenderTheme.GHOST_FRIGHTENED
-                : color;
+        return mode == GhostMode.FRIGHTENED ? RenderTheme.GHOST_FRIGHTENED : color;
     }
 
+    @Override
     public GridPosition getPosition() {
         return position;
     }
 
+    @Override
     public int getCol() {
         return position.getCol();
     }
 
+    @Override
     public int getRow() {
         return position.getRow();
     }
 
+    @Override
     public GhostMode getMode() {
         return mode;
     }
 
+    @Override
     public boolean isActiveForCollision() {
         return mode == GhostMode.ACTIVE || mode == GhostMode.FRIGHTENED || mode == GhostMode.LEAVING;
     }
 
+    @Override
     public boolean isEdibleByPacman() {
         return mode == GhostMode.FRIGHTENED;
     }
 
+    @Override
     public boolean isPendingRespawn() {
         return pendingRespawn;
     }
 
+    @Override
     public void enterFrightened() {
         if (mode == GhostMode.ACTIVE || mode == GhostMode.LEAVING) {
             mode = GhostMode.FRIGHTENED;
         }
     }
 
+    @Override
     public void exitFrightened() {
         if (mode == GhostMode.FRIGHTENED) {
             mode = GhostMode.ACTIVE;
         }
     }
 
+    @Override
     public void beEaten() {
         pendingRespawn = true;
         enterHouse();
     }
 
+    @Override
     public void update(Maze maze, Pacman pacman, List<Ghost> allGhosts) {
         ensureOnWalkableTile(maze);
 

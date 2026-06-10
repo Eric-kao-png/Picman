@@ -1,8 +1,8 @@
 package com.picman.model.ai;
 
-import com.picman.model.entity.Ghost;
 import com.picman.model.entity.GhostDefinitions;
 import com.picman.model.entity.Pacman;
+import com.picman.model.entity.Ghost.Ghost;
 
 import java.util.List;
 
