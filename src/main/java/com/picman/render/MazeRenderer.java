@@ -6,6 +6,7 @@ import com.picman.model.CellType;
 import com.picman.model.ItemType;
 import com.picman.model.Maze;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class MazeRenderer {
@@ -21,8 +22,7 @@ public class MazeRenderer {
                 CellType cell = maze.getCellType(col, row);
 
                 if (cell == CellType.WALL) {
-                    g.setColor(RenderTheme.WALL);
-                    g.fillRect(x, y, GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
+                    renderWall(g, maze, col, row, x, y);
                 } else if (cell == CellType.COIN) {
                     g.setColor(RenderTheme.COIN);
                     g.fillOval(x + coinMargin, y + coinMargin, coinSize, coinSize);
@@ -30,9 +30,26 @@ public class MazeRenderer {
                     renderPowerCoin(g, x, y);
                 } else if (cell == CellType.EXTRA_LIFE_ITEM) {
                     renderSpawnedItem(g, x, y, ItemType.EXTRA_LIFE);
+                } else if (cell == CellType.PICKAXE_ITEM) {
+                    renderSpawnedItem(g, x, y, ItemType.PICKAXE);
                 }
             }
         }
+    }
+
+    private void renderWall(Graphics2D g, Maze maze, int col, int row, int x, int y) {
+        float progress = maze.getWallRecoveryProgress(col, row);
+        if (progress <= 0f) {
+            return;
+        }
+        Color wall = RenderTheme.WALL;
+        if (progress < 1f) {
+            int alpha = Math.max(1, Math.round(255f * progress));
+            g.setColor(new Color(wall.getRed(), wall.getGreen(), wall.getBlue(), alpha));
+        } else {
+            g.setColor(wall);
+        }
+        g.fillRect(x, y, GameConfig.TILE_SIZE, GameConfig.TILE_SIZE);
     }
 
     private void renderPowerCoin(Graphics2D g, int x, int y) {
@@ -51,6 +68,7 @@ public class MazeRenderer {
         g.setColor(RenderTheme.HUD_TEXT);
         int centerX = x + GameConfig.TILE_SIZE / 2;
         int centerY = y + GameConfig.TILE_SIZE / 2 + 4;
-        g.drawString("+", centerX - 3, centerY);
+        String label = itemType == ItemType.EXTRA_LIFE ? "+" : "P";
+        g.drawString(label, centerX - 3, centerY);
     }
 }

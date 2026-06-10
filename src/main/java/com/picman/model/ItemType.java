@@ -6,7 +6,8 @@ import java.awt.Color;
 
 public enum ItemType {
     EXTRA_LIFE(CellType.EXTRA_LIFE_ITEM, RenderTheme.ITEM_EXTRA_LIFE),
-    TEMP_POWER_COIN(CellType.TEMP_POWER_COIN, RenderTheme.POWER_COIN);
+    TEMP_POWER_COIN(CellType.TEMP_POWER_COIN, RenderTheme.POWER_COIN),
+    PICKAXE(CellType.PICKAXE_ITEM, RenderTheme.ITEM_PICKAXE);
 
     private final CellType cellType;
     private final Color color;

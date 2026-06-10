@@ -23,6 +23,12 @@ public final class GhostHouseConfig {
     /** 離開房間後的列（門口外通道） */
     public static final int EXIT_ROW = 17;
 
+    /** 鎬子不可破壞的幽靈房區域（含外殼牆，略大於房體幾何） */
+    public static final int PICKAXE_PROTECT_MIN_COL = WALL_MIN_COL - 1;
+    public static final int PICKAXE_PROTECT_MAX_COL = WALL_MAX_COL + 1;
+    public static final int PICKAXE_PROTECT_MIN_ROW = WALL_TOP_ROW - 1;
+    public static final int PICKAXE_PROTECT_MAX_ROW = EXIT_ROW + 1;
+
     public static final int RELEASE_INTERVAL_TICKS = 45;
 
     public static boolean isDoorCell(int col, int row) {

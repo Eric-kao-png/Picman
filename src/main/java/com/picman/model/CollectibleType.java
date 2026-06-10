@@ -4,5 +4,6 @@ public enum CollectibleType {
     NONE,
     COIN,
     POWER_COIN,
-    EXTRA_LIFE_ITEM
+    EXTRA_LIFE_ITEM,
+    PICKAXE_ITEM
 }

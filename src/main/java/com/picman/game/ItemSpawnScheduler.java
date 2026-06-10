@@ -74,6 +74,7 @@ public class ItemSpawnScheduler {
     private ItemType pickSpawnType(GameSession session) {
         List<ItemType> candidates = new ArrayList<>();
         candidates.add(ItemType.TEMP_POWER_COIN);
+        candidates.add(ItemType.PICKAXE);
         if (session.getLives() < ItemSpawnConfig.MAX_LIVES) {
             candidates.add(ItemType.EXTRA_LIFE);
         }

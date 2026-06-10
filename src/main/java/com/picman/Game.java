@@ -12,6 +12,7 @@ import com.picman.model.entity.GhostReleaseScheduler;
 import com.picman.model.entity.Pacman;
 import com.picman.render.GameRenderer;
 import com.picman.render.ViewLayout;
+import com.picman.movement.GridMovement;
 import com.picman.util.Direction;
 
 import java.awt.Graphics2D;
@@ -40,7 +41,11 @@ public class Game {
         session.tickElapsed();
         session.tickInvincibility();
         session.tickPowered();
-        pacman.update(maze);
+        session.tickPickaxe();
+        maze.tickBrokenWalls();
+        GridMovement.ejectFromSolidCell(maze, pacman.getPosition());
+        pacman.update(maze, session.isPickaxeActive());
+        GridMovement.ejectFromSolidCell(maze, pacman.getPosition());
 
         itemSpawnScheduler.tick(maze, session);
         handleCollectibleAtPacman();
@@ -75,6 +80,10 @@ public class Game {
             }
             case EXTRA_LIFE_ITEM -> {
                 session.onExtraLifeCollected();
+                itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
+            }
+            case PICKAXE_ITEM -> {
+                session.onPickaxeCollected();
                 itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
             }
             case NONE -> {

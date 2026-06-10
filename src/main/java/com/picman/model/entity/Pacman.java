@@ -59,27 +59,27 @@ public class Pacman {
         lastFacingDirection = facing;
     }
 
-    public void update(Maze maze) {
+    public void update(Maze maze, boolean canBreakWalls) {
         if (activeDirection == null) {
             direction = null;
             return;
         }
 
-        applyTurnIfPossible(maze);
+        applyTurnIfPossible(maze, canBreakWalls);
         if (direction == null) {
             return;
         }
 
-        GridMovement.movePacman(maze, position, direction);
+        GridMovement.movePacman(maze, position, direction, canBreakWalls);
     }
 
-    private void applyTurnIfPossible(Maze maze) {
-        if (GridMovement.canTurn(position, direction, activeDirection, maze)) {
+    private void applyTurnIfPossible(Maze maze, boolean canBreakWalls) {
+        if (GridMovement.canTurn(position, direction, activeDirection, maze, canBreakWalls)) {
             direction = activeDirection;
             recordFacing(direction);
             return;
         }
-        if (direction == null && GridMovement.canTurn(position, null, activeDirection, maze)) {
+        if (direction == null && GridMovement.canTurn(position, null, activeDirection, maze, canBreakWalls)) {
             direction = activeDirection;
             recordFacing(direction);
         }

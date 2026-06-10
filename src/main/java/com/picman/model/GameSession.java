@@ -2,6 +2,7 @@ package com.picman.model;
 
 import com.picman.config.GameConfig;
 import com.picman.config.ItemSpawnConfig;
+import com.picman.config.PickaxeConfig;
 import com.picman.config.PowerCoinConfig;
 
 public class GameSession {
@@ -10,6 +11,7 @@ public class GameSession {
     private int lives = GameConfig.INITIAL_LIVES;
     private int invincibleTicks;
     private int poweredTicks;
+    private int pickaxeTicks;
     private int pelletsCollected;
     private int ghostsEaten;
     private int elapsedTicks;
@@ -50,6 +52,10 @@ public class GameSession {
         return poweredTicks > 0;
     }
 
+    public boolean isPickaxeActive() {
+        return pickaxeTicks > 0;
+    }
+
     public int getInvincibleTicks() {
         return invincibleTicks;
     }
@@ -63,6 +69,12 @@ public class GameSession {
     public void tickPowered() {
         if (poweredTicks > 0) {
             poweredTicks--;
+        }
+    }
+
+    public void tickPickaxe() {
+        if (pickaxeTicks > 0) {
+            pickaxeTicks--;
         }
     }
 
@@ -96,6 +108,11 @@ public class GameSession {
         }
     }
 
+    public void onPickaxeCollected() {
+        addScore(PickaxeConfig.SCORE);
+        pickaxeTicks = PickaxeConfig.PICKAXE_TICKS;
+    }
+
     public void onGhostHit() {
         lives--;
         if (lives <= 0) {
@@ -115,6 +132,7 @@ public class GameSession {
         lives = GameConfig.INITIAL_LIVES;
         invincibleTicks = 0;
         poweredTicks = 0;
+        pickaxeTicks = 0;
         pelletsCollected = 0;
         ghostsEaten = 0;
         elapsedTicks = 0;

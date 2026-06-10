@@ -2,6 +2,8 @@ package com.picman.model;
 
 import com.picman.level.GhostHouseGeometry;
 import com.picman.level.LevelInitializer;
+import com.picman.maze.BreakableWallRules;
+import com.picman.maze.BrokenWallTracker;
 import com.picman.maze.MazeNavigator;
 import com.picman.util.Direction;
 
@@ -9,6 +11,7 @@ import java.util.List;
 
 public class Maze {
     private final int[][] grid;
+    private final BrokenWallTracker brokenWalls = new BrokenWallTracker();
 
     public Maze() {
         grid = LevelInitializer.createPlayfieldGrid();
@@ -18,6 +21,25 @@ public class Maze {
         int[][] fresh = LevelInitializer.createPlayfieldGrid();
         for (int row = 0; row < grid.length; row++) {
             System.arraycopy(fresh[row], 0, grid[row], 0, grid[row].length);
+        }
+        brokenWalls.reset();
+    }
+
+    public void tickBrokenWalls() {
+        brokenWalls.tick();
+    }
+
+    public boolean isBrokenWall(int col, int row) {
+        return brokenWalls.isBroken(col, row);
+    }
+
+    public boolean canBreakWall(int col, int row) {
+        return BreakableWallRules.canBreak(this, col, row);
+    }
+
+    public void breakWall(int col, int row) {
+        if (canBreakWall(col, row)) {
+            brokenWalls.breakWall(col, row);
         }
     }
 
@@ -41,6 +63,22 @@ public class Maze {
         return inBounds(col, row) && getCellType(col, row) != CellType.WALL;
     }
 
+    /** Pac-Man 專用：已破壞牆格與非牆格可走；未破壞的牆格不可站立。 */
+    public boolean isWalkableForPacman(int col, int row) {
+        if (!inBounds(col, row)) {
+            return false;
+        }
+        if (isBrokenWall(col, row)) {
+            return true;
+        }
+        return getCellType(col, row) != CellType.WALL;
+    }
+
+    /** 牆體恢復進度，供渲染與碰撞同步（0=剛破壞，1=實心牆）。 */
+    public float getWallRecoveryProgress(int col, int row) {
+        return brokenWalls.getRecoveryProgress(col, row);
+    }
+
     public CollectibleType tryEatCollectible(int col, int row) {
         if (!inBounds(col, row)) {
             return CollectibleType.NONE;
@@ -61,6 +99,10 @@ public class Maze {
         if (cell == CellType.TEMP_POWER_COIN) {
             grid[row][col] = CellType.EMPTY.getCode();
             return CollectibleType.POWER_COIN;
+        }
+        if (cell == CellType.PICKAXE_ITEM) {
+            grid[row][col] = CellType.EMPTY.getCode();
+            return CollectibleType.PICKAXE_ITEM;
         }
         return CollectibleType.NONE;
     }

@@ -43,4 +43,12 @@ public final class GhostHouseGeometry {
                 || GhostHouseConfig.isDoorCell(col, row)
                 || GhostHouseConfig.isExitCorridorCell(col, row);
     }
+
+    /** 鎬子不可破壞的幽靈房區域（房體、門口與周邊外殼牆）。 */
+    public static boolean isPickaxeProtected(int col, int row) {
+        return col >= GhostHouseConfig.PICKAXE_PROTECT_MIN_COL
+                && col <= GhostHouseConfig.PICKAXE_PROTECT_MAX_COL
+                && row >= GhostHouseConfig.PICKAXE_PROTECT_MIN_ROW
+                && row <= GhostHouseConfig.PICKAXE_PROTECT_MAX_ROW;
+    }
 }
