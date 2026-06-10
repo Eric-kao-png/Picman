@@ -1,6 +1,7 @@
 package com.picman.model.entity;
 
 import com.picman.config.GhostHouseConfig;
+import com.picman.model.entity.Ghost.Ghost;
 
 import java.util.List;
 

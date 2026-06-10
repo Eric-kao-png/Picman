@@ -1,10 +1,13 @@
-package com.picman.model.entity;
+package com.picman.model.entity.Ghost;
 
 import com.picman.config.GhostHouseConfig;
 import com.picman.config.GhostSpawn;
 import com.picman.model.Maze;
 import com.picman.model.ai.GhostAI;
 import com.picman.model.ai.GhostAIContext;
+import com.picman.model.entity.GhostMode;
+import com.picman.model.entity.GridPosition;
+import com.picman.model.entity.Pacman;
 import com.picman.movement.GhostMover;
 import com.picman.movement.GridMath;
 import com.picman.movement.TurnPlanner;
@@ -13,7 +16,7 @@ import com.picman.util.Direction;
 import java.awt.Color;
 import java.util.List;
 
-public class Ghost {
+public class Red_Ghost implements Ghost {
     private final int spawnCol;
     private final int spawnRow;
     private final Direction initialDirection;
@@ -24,7 +27,7 @@ public class Ghost {
     private GhostMode mode = GhostMode.WAITING;
     private Direction direction;
 
-    public Ghost(GhostSpawn spawn) {
+    public Red_Ghost(GhostSpawn spawn) {
         this.spawnCol = spawn.col();
         this.spawnRow = spawn.row();
         this.initialDirection = spawn.initialDirection();
@@ -34,16 +37,19 @@ public class Ghost {
         this.direction = initialDirection;
     }
 
+    @Override
     public void enterHouse() {
         position.snapToCell(spawnCol, spawnRow);
         direction = null;
         mode = GhostMode.WAITING;
     }
 
+    @Override
     public void reset() {
         enterHouse();
     }
 
+    @Override
     public void releaseFromHouse() {
         if (mode == GhostMode.WAITING) {
             mode = GhostMode.LEAVING;
@@ -51,26 +57,32 @@ public class Ghost {
         }
     }
 
+    @Override
     public Color getColor() {
         return color;
     }
 
+    @Override
     public GridPosition getPosition() {
         return position;
     }
 
+    @Override
     public int getCol() {
         return position.getCol();
     }
 
+    @Override
     public int getRow() {
         return position.getRow();
     }
 
+    @Override
     public boolean isActiveForCollision() {
         return mode != GhostMode.WAITING;
     }
 
+    @Override
     public void update(Maze maze, Pacman pacman, List<Ghost> allGhosts) {
         ensureOnWalkableTile(maze);
 

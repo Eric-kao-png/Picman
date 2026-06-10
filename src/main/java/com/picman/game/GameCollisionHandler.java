@@ -3,9 +3,9 @@ package com.picman.game;
 import com.picman.collision.CollisionDetector;
 import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
-import com.picman.model.entity.Ghost;
 import com.picman.model.entity.GhostReleaseScheduler;
 import com.picman.model.entity.Pacman;
+import com.picman.model.entity.Ghost.Ghost;
 
 import java.util.List;
 
