@@ -1,12 +1,14 @@
 package com.picman.model;
 
 import com.picman.config.GameConfig;
+import com.picman.config.PowerCoinConfig;
 
 public class GameSession {
     private GameStatus status = GameStatus.PLAYING;
     private int score;
     private int lives = GameConfig.INITIAL_LIVES;
     private int invincibleTicks;
+    private int poweredTicks;
 
     public boolean isPlaying() {
         return status == GameStatus.PLAYING;
@@ -28,6 +30,10 @@ public class GameSession {
         return invincibleTicks > 0;
     }
 
+    public boolean isPowered() {
+        return poweredTicks > 0;
+    }
+
     public int getInvincibleTicks() {
         return invincibleTicks;
     }
@@ -38,12 +44,27 @@ public class GameSession {
         }
     }
 
+    public void tickPowered() {
+        if (poweredTicks > 0) {
+            poweredTicks--;
+        }
+    }
+
     public void addScore(int points) {
         score += points;
     }
 
     public void onCoinCollected() {
         addScore(GameConfig.COIN_SCORE);
+    }
+
+    public void onPowerCoinCollected() {
+        addScore(PowerCoinConfig.SCORE);
+        poweredTicks = PowerCoinConfig.POWERED_TICKS;
+    }
+
+    public void onGhostEaten() {
+        addScore(PowerCoinConfig.SCORE);
     }
 
     public void onGhostHit() {
@@ -64,5 +85,6 @@ public class GameSession {
         score = 0;
         lives = GameConfig.INITIAL_LIVES;
         invincibleTicks = 0;
+        poweredTicks = 0;
     }
 }

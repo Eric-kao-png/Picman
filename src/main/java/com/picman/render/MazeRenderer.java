@@ -25,6 +25,11 @@ public class MazeRenderer {
                 } else if (cell == CellType.COIN) {
                     g.setColor(RenderTheme.COIN);
                     g.fillOval(x + coinMargin, y + coinMargin, coinSize, coinSize);
+                } else if (cell == CellType.POWER_COIN) {
+                    int powerMargin = coinMargin / 2;
+                    int powerSize = GameConfig.TILE_SIZE - powerMargin * 2;
+                    g.setColor(RenderTheme.POWER_COIN);
+                    g.fillOval(x + powerMargin, y + powerMargin, powerSize, powerSize);
                 }
             }
         }

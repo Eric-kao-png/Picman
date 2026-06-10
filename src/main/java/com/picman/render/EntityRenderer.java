@@ -26,7 +26,7 @@ public class EntityRenderer {
 
     public void renderGhost(Graphics2D g, Ghost ghost) {
         EntityDrawBounds bounds = EntityDrawBounds.from(ghost.getPosition());
-        g.setColor(ghost.getColor());
+        g.setColor(ghost.getDisplayColor());
         g.fillRoundRect(
                 bounds.innerX(),
                 bounds.innerY(),

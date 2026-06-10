@@ -41,14 +41,23 @@ public class Maze {
         return inBounds(col, row) && getCellType(col, row) != CellType.WALL;
     }
 
-    public boolean tryEatCoin(int col, int row) {
-        if (!inBounds(col, row) || getCellType(col, row) != CellType.COIN) {
-            return false;
+    public CollectibleType tryEatCollectible(int col, int row) {
+        if (!inBounds(col, row)) {
+            return CollectibleType.NONE;
         }
-        grid[row][col] = CellType.EMPTY.getCode();
-        return true;
+        CellType cell = getCellType(col, row);
+        if (cell == CellType.COIN) {
+            grid[row][col] = CellType.EMPTY.getCode();
+            return CollectibleType.COIN;
+        }
+        if (cell == CellType.POWER_COIN) {
+            grid[row][col] = CellType.EMPTY.getCode();
+            return CollectibleType.POWER_COIN;
+        }
+        return CollectibleType.NONE;
     }
 
+    /** 僅計算普通金幣；大金幣不影響過關條件。 */
     public boolean noCoinsLeft() {
         for (int[] row : grid) {
             for (int cell : row) {

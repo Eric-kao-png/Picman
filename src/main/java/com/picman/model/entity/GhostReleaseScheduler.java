@@ -1,22 +1,44 @@
 package com.picman.model.entity;
 
 import com.picman.config.GhostHouseConfig;
+import com.picman.config.PowerCoinConfig;
 
+import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Queue;
 
 public class GhostReleaseScheduler {
     private int nextIndex;
     private int cooldownTicks;
+    private int respawnCooldownTicks;
+    private final Queue<Integer> respawnQueue = new ArrayDeque<>();
 
     public void reset(List<Ghost> ghosts) {
         nextIndex = 0;
         cooldownTicks = 0;
+        respawnCooldownTicks = 0;
+        respawnQueue.clear();
         for (Ghost ghost : ghosts) {
-            ghost.enterHouse();
+            ghost.reset();
         }
     }
 
     public void tick(List<Ghost> ghosts) {
+        tickInitialRelease(ghosts);
+        tickRespawnRelease(ghosts);
+    }
+
+    public void onGhostEaten(Ghost ghost, List<Ghost> ghosts) {
+        int index = ghosts.indexOf(ghost);
+        if (index >= 0 && !respawnQueue.contains(index)) {
+            respawnQueue.add(index);
+        }
+        if (respawnCooldownTicks == 0) {
+            respawnCooldownTicks = PowerCoinConfig.GHOST_RESPAWN_DELAY_TICKS;
+        }
+    }
+
+    private void tickInitialRelease(List<Ghost> ghosts) {
         if (nextIndex >= ghosts.size()) {
             return;
         }
@@ -30,4 +52,29 @@ public class GhostReleaseScheduler {
         cooldownTicks = GhostHouseConfig.RELEASE_INTERVAL_TICKS;
     }
 
+    private void tickRespawnRelease(List<Ghost> ghosts) {
+        if (respawnQueue.isEmpty()) {
+            return;
+        }
+        if (respawnCooldownTicks > 0) {
+            respawnCooldownTicks--;
+            return;
+        }
+
+        Integer index = respawnQueue.poll();
+        if (index == null || index < 0 || index >= ghosts.size()) {
+            return;
+        }
+
+        Ghost ghost = ghosts.get(index);
+        if (ghost.getMode() == GhostMode.WAITING && ghost.isPendingRespawn()) {
+            ghost.releaseFromHouse();
+        } else if (ghost.getMode() == GhostMode.WAITING) {
+            ghost.releaseFromHouse();
+        }
+
+        if (!respawnQueue.isEmpty()) {
+            respawnCooldownTicks = GhostHouseConfig.RELEASE_INTERVAL_TICKS;
+        }
+    }
 }

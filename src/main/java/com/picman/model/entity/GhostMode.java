@@ -6,5 +6,7 @@ public enum GhostMode {
     /** 已放行，沿出口離開房間 */
     LEAVING,
     /** 一般追擊 */
-    ACTIVE
+    ACTIVE,
+    /** 被大金幣影響，可被玩家吃掉 */
+    FRIGHTENED
 }

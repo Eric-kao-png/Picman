@@ -3,7 +3,8 @@ package com.picman.model;
 public enum CellType {
     EMPTY(0),
     WALL(1),
-    COIN(2);
+    COIN(2),
+    POWER_COIN(3);
 
     private final int code;
 

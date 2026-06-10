@@ -18,6 +18,7 @@ public final class LevelInitializer {
                 grid[row][col] = resolveCellCode(raw[row][col], col, row);
             }
         }
+        PowerCoinPlacements.apply(grid);
         return grid;
     }
 

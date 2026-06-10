@@ -1,6 +1,7 @@
 package com.picman;
 
 import com.picman.game.GameCollisionHandler;
+import com.picman.model.CollectibleType;
 import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
 import com.picman.model.Maze;
@@ -33,11 +34,18 @@ public class Game {
             return;
         }
 
+        boolean wasPowered = session.isPowered();
+
         session.tickInvincibility();
+        session.tickPowered();
         pacman.update(maze);
 
-        if (maze.tryEatCoin(pacman.getCol(), pacman.getRow())) {
-            session.onCoinCollected();
+        handleCollectibleAtPacman();
+
+        if (!wasPowered && session.isPowered()) {
+            ghosts.forEach(Ghost::enterFrightened);
+        } else if (wasPowered && !session.isPowered()) {
+            ghosts.forEach(Ghost::exitFrightened);
         }
 
         ghostReleaseScheduler.tick(ghosts);
@@ -48,6 +56,16 @@ public class Game {
 
         if (maze.noCoinsLeft()) {
             session.onAllCoinsCollected();
+        }
+    }
+
+    private void handleCollectibleAtPacman() {
+        CollectibleType collected = maze.tryEatCollectible(pacman.getCol(), pacman.getRow());
+        switch (collected) {
+            case COIN -> session.onCoinCollected();
+            case POWER_COIN -> session.onPowerCoinCollected();
+            case NONE -> {
+            }
         }
     }
 

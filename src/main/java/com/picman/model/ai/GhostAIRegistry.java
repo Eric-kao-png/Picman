@@ -12,6 +12,7 @@ public final class GhostAIRegistry {
     public static final GhostAI ORANGE_CLYDE_PATHFINDING = new OrangePathfindingGhostAI(
             PATHFINDING_CHASE,
             new FleeDirectionSelector());
+    public static final GhostAI FRIGHTENED_FLEE = new FleeDirectionSelector();
 
     private GhostAIRegistry() {
     }
