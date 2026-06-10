@@ -5,7 +5,8 @@ public enum CellType {
     WALL(1),
     COIN(2),
     POWER_COIN(3),
-    EXTRA_LIFE_ITEM(4);
+    EXTRA_LIFE_ITEM(4),
+    TEMP_POWER_COIN(5);
 
     private final int code;
 

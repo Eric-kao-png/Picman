@@ -5,7 +5,8 @@ import com.picman.config.RenderTheme;
 import java.awt.Color;
 
 public enum ItemType {
-    EXTRA_LIFE(CellType.EXTRA_LIFE_ITEM, RenderTheme.ITEM_EXTRA_LIFE);
+    EXTRA_LIFE(CellType.EXTRA_LIFE_ITEM, RenderTheme.ITEM_EXTRA_LIFE),
+    TEMP_POWER_COIN(CellType.TEMP_POWER_COIN, RenderTheme.POWER_COIN);
 
     private final CellType cellType;
     private final Color color;

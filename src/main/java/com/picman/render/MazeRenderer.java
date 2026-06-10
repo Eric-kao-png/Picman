@@ -26,16 +26,21 @@ public class MazeRenderer {
                 } else if (cell == CellType.COIN) {
                     g.setColor(RenderTheme.COIN);
                     g.fillOval(x + coinMargin, y + coinMargin, coinSize, coinSize);
-                } else if (cell == CellType.POWER_COIN) {
-                    int powerMargin = coinMargin / 2;
-                    int powerSize = GameConfig.TILE_SIZE - powerMargin * 2;
-                    g.setColor(RenderTheme.POWER_COIN);
-                    g.fillOval(x + powerMargin, y + powerMargin, powerSize, powerSize);
+                } else if (cell == CellType.POWER_COIN || cell == CellType.TEMP_POWER_COIN) {
+                    renderPowerCoin(g, x, y);
                 } else if (cell == CellType.EXTRA_LIFE_ITEM) {
                     renderSpawnedItem(g, x, y, ItemType.EXTRA_LIFE);
                 }
             }
         }
+    }
+
+    private void renderPowerCoin(Graphics2D g, int x, int y) {
+        int coinMargin = GameConfig.TILE_SIZE / GameConfig.COIN_DRAW_MARGIN_DIVISOR;
+        int powerMargin = coinMargin / 2;
+        int powerSize = GameConfig.TILE_SIZE - powerMargin * 2;
+        g.setColor(RenderTheme.POWER_COIN);
+        g.fillOval(x + powerMargin, y + powerMargin, powerSize, powerSize);
     }
 
     private void renderSpawnedItem(Graphics2D g, int x, int y, ItemType itemType) {

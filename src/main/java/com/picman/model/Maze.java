@@ -58,6 +58,10 @@ public class Maze {
             grid[row][col] = CellType.EMPTY.getCode();
             return CollectibleType.EXTRA_LIFE_ITEM;
         }
+        if (cell == CellType.TEMP_POWER_COIN) {
+            grid[row][col] = CellType.EMPTY.getCode();
+            return CollectibleType.POWER_COIN;
+        }
         return CollectibleType.NONE;
     }
 
@@ -69,8 +73,8 @@ public class Maze {
         return true;
     }
 
-    public void clearSpawnedItem(int col, int row) {
-        if (!inBounds(col, row) || getCellType(col, row) != CellType.EXTRA_LIFE_ITEM) {
+    public void clearSpawnedItem(int col, int row, CellType itemType) {
+        if (!inBounds(col, row) || getCellType(col, row) != itemType) {
             return;
         }
         grid[row][col] = CellType.EMPTY.getCode();

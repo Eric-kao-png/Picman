@@ -6,6 +6,8 @@ import com.picman.model.GameSession;
 import com.picman.model.ItemType;
 import com.picman.model.Maze;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -30,7 +32,7 @@ public class ItemSpawnScheduler {
             spawnCooldownTicks--;
             return;
         }
-        trySpawnExtraLife(maze, session);
+        trySpawnRandomItem(maze, session);
         spawnCooldownTicks = ItemSpawnConfig.SPAWN_INTERVAL_TICKS;
     }
 
@@ -49,23 +51,33 @@ public class ItemSpawnScheduler {
         }
         activeItem.remainingTicks--;
         if (activeItem.remainingTicks <= 0) {
-            maze.clearSpawnedItem(activeItem.col, activeItem.row);
+            maze.clearSpawnedItem(activeItem.col, activeItem.row, activeItem.type.getCellType());
             activeItem = null;
         }
     }
 
-    private void trySpawnExtraLife(Maze maze, GameSession session) {
-        if (session.getLives() >= ItemSpawnConfig.MAX_LIVES) {
+    private void trySpawnRandomItem(Maze maze, GameSession session) {
+        ItemType type = pickSpawnType(session);
+        if (type == null) {
             return;
         }
         int[] cell = SpawnCellSelector.pickRandomEmptyCell(maze, random);
         if (cell == null) {
             return;
         }
-        if (!maze.placeSpawnedItem(cell[0], cell[1], ItemType.EXTRA_LIFE.getCellType())) {
+        if (!maze.placeSpawnedItem(cell[0], cell[1], type.getCellType())) {
             return;
         }
-        activeItem = new ActiveItem(cell[0], cell[1], ItemType.EXTRA_LIFE, ItemSpawnConfig.ITEM_DURATION_TICKS);
+        activeItem = new ActiveItem(cell[0], cell[1], type, ItemSpawnConfig.ITEM_DURATION_TICKS);
+    }
+
+    private ItemType pickSpawnType(GameSession session) {
+        List<ItemType> candidates = new ArrayList<>();
+        candidates.add(ItemType.TEMP_POWER_COIN);
+        if (session.getLives() < ItemSpawnConfig.MAX_LIVES) {
+            candidates.add(ItemType.EXTRA_LIFE);
+        }
+        return candidates.get(random.nextInt(candidates.size()));
     }
 
     private static final class ActiveItem {

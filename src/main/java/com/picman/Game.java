@@ -68,7 +68,10 @@ public class Game {
         CollectibleType collected = maze.tryEatCollectible(pacman.getCol(), pacman.getRow());
         switch (collected) {
             case COIN -> session.onCoinCollected();
-            case POWER_COIN -> session.onPowerCoinCollected();
+            case POWER_COIN -> {
+                session.onPowerCoinCollected();
+                itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
+            }
             case EXTRA_LIFE_ITEM -> {
                 session.onExtraLifeCollected();
                 itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
