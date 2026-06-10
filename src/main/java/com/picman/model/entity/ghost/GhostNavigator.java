@@ -64,6 +64,37 @@ final class GhostNavigator {
         }
     }
 
+    static void updateChaseWithSpeed(
+            Maze maze,
+            Pacman pacman,
+            List<Ghost> allGhosts,
+            GridPosition position,
+            GhostMode mode,
+            Supplier<Direction> getDirection,
+            Consumer<Direction> setDirection,
+            GhostAI chaseAi,
+            GhostAI frightenedAi,
+            double speed) {
+        replanAtIntersection(maze, pacman, allGhosts, position, mode, getDirection, setDirection, chaseAi, frightenedAi);
+        if (getDirection.get() != null) {
+            com.picman.movement.FastGhostMover.advance(maze, position, getDirection.get(), speed);
+        }
+    }
+
+    static void updateLeavingWithSpeed(
+            Maze maze,
+            GridPosition position,
+            Supplier<Direction> getDirection,
+            Consumer<Direction> setDirection,
+            Consumer<GhostMode> setMode,
+            double speed) {
+        setDirection.accept(Direction.DOWN);
+        if (com.picman.movement.FastGhostMover.advance(maze, position, getDirection.get(), speed) && position.getRow() >= GhostHouseConfig.EXIT_ROW) {
+            setMode.accept(GhostMode.ACTIVE);
+            setDirection.accept(Direction.DOWN);
+        }
+    }
+
     private static void replanAtIntersection(
             Maze maze,
             Pacman pacman,

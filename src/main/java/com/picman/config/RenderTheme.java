@@ -18,6 +18,7 @@ public final class RenderTheme {
     public static final Color GHOST_PINK = new Color(255, 105, 180);
     public static final Color GHOST_CYAN = Color.CYAN;
     public static final Color GHOST_ORANGE = new Color(255, 165, 0);
+    public static final Color GHOST_WHITE = Color.WHITE;
     public static final Color HUD_TEXT = Color.WHITE;
     public static final Color OVERLAY = new Color(0, 0, 0, 160);
 }

@@ -1,4 +1,4 @@
-package com.picman.model.entity.ghostfactory;
+package com.picman.model.entity.ghostFactory;
 
 import com.picman.model.entity.ghost.Ghost;
 

@@ -40,7 +40,7 @@ public class GhostReleaseScheduler {
     }
 
     private void tickInitialRelease(List<Ghost> ghosts) {
-        if (nextIndex >= ghosts.size()) {
+        if (nextIndex >= ghosts.size() - 1) {   // 有刻意 - 1，因為最後一隻幽靈（白色）不受初始釋放機制控制
             return;
         }
         if (cooldownTicks > 0) {

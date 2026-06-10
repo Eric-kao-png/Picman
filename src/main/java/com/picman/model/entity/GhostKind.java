@@ -3,25 +3,30 @@ package com.picman.model.entity;
 import com.picman.config.GhostSpawn;
 
 /**
- * 四隻幽靈在 {@link GhostDefinitions#ALL} 中的固定順序。
+ * 幽靈類型常量與索引管理。
+ * 提供向後相容的 API，背後使用 {@link GhostRegistry}。
  */
-public enum GhostKind {
-    RED(0),
-    PINK(1),
-    CYAN(2),
-    ORANGE(3);
+public class GhostKind {
+    public static final String RED = "RED";
+    public static final String PINK = "PINK";
+    public static final String CYAN = "CYAN";
+    public static final String ORANGE = "ORANGE";
+    public static final String WHITE = "WHITE";
 
-    private final int listIndex;
-
-    GhostKind(int listIndex) {
-        this.listIndex = listIndex;
+    private GhostKind() {
     }
 
-    public int index() {
-        return listIndex;
+    /**
+     * 獲取幽靈的索引。
+     */
+    public static int index(String ghostName) {
+        return GhostRegistry.getInstance().getIndex(ghostName);
     }
 
-    public GhostSpawn spawn() {
-        return GhostDefinitions.ALL.get(listIndex);
+    /**
+     * 根據幽靈名稱獲取生成配置。
+     */
+    public static GhostSpawn spawn(String ghostName) {
+        return GhostRegistry.getInstance().getSpawn(ghostName);
     }
 }

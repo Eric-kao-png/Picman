@@ -1,12 +1,12 @@
 package com.picman.model.entity.ghostFactory;
 
 import com.picman.model.entity.GhostKind;
-import com.picman.model.entity.ghost.CyanGhost;
 import com.picman.model.entity.ghost.Ghost;
+import com.picman.model.entity.ghost.WhiteGhost;
 
-public class CyanGhostFactory implements GhostFactory {
+public class WhiteGhostFactory implements GhostFactory {
     @Override
     public Ghost createGhost() {
-        return new CyanGhost(GhostKind.spawn(GhostKind.CYAN));
+        return new WhiteGhost(GhostKind.spawn(GhostKind.WHITE));
     }
 }
