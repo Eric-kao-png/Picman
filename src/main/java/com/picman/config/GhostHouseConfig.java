@@ -4,15 +4,15 @@ public final class GhostHouseConfig {
     private GhostHouseConfig() {
     }
 
-    /** 幽靈房外框（單層牆） */
+    /** 幽靈房外框（單層牆；col 11 與 16 為地圖左右鏡像對） */
     public static final int WALL_MIN_COL = 11;
-    public static final int WALL_MAX_COL = 17;
+    public static final int WALL_MAX_COL = 16;
     public static final int WALL_TOP_ROW = 12;
     public static final int WALL_BOTTOM_ROW = 16;
 
     /** 房內可走區域（不含牆） */
     public static final int INTERIOR_MIN_COL = 12;
-    public static final int INTERIOR_MAX_COL = 16;
+    public static final int INTERIOR_MAX_COL = 15;
     public static final int INTERIOR_MIN_ROW = 13;
     public static final int INTERIOR_MAX_ROW = 15;
 
