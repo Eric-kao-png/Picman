@@ -10,6 +10,9 @@ public class GameSession {
     private int lives = GameConfig.INITIAL_LIVES;
     private int invincibleTicks;
     private int poweredTicks;
+    private int pelletsCollected;
+    private int ghostsEaten;
+    private int elapsedTicks;
 
     public boolean isPlaying() {
         return status == GameStatus.PLAYING;
@@ -25,6 +28,18 @@ public class GameSession {
 
     public int getLives() {
         return lives;
+    }
+
+    public int getPelletsCollected() {
+        return pelletsCollected;
+    }
+
+    public int getGhostsEaten() {
+        return ghostsEaten;
+    }
+
+    public int getElapsedSeconds() {
+        return elapsedTicks * GameConfig.TICK_MS / 1000;
     }
 
     public boolean isInvincible() {
@@ -51,20 +66,27 @@ public class GameSession {
         }
     }
 
+    public void tickElapsed() {
+        elapsedTicks++;
+    }
+
     public void addScore(int points) {
         score += points;
     }
 
     public void onCoinCollected() {
+        pelletsCollected++;
         addScore(GameConfig.COIN_SCORE);
     }
 
     public void onPowerCoinCollected() {
+        pelletsCollected++;
         addScore(PowerCoinConfig.SCORE);
         poweredTicks = PowerCoinConfig.POWERED_TICKS;
     }
 
     public void onGhostEaten() {
+        ghostsEaten++;
         addScore(PowerCoinConfig.SCORE);
     }
 
@@ -93,5 +115,8 @@ public class GameSession {
         lives = GameConfig.INITIAL_LIVES;
         invincibleTicks = 0;
         poweredTicks = 0;
+        pelletsCollected = 0;
+        ghostsEaten = 0;
+        elapsedTicks = 0;
     }
 }

@@ -16,7 +16,7 @@ public class GameFrame extends JFrame {
         super("PAC-MAN");
 
         Game game = new Game();
-        gamePanel = new GamePanel(game);
+        gamePanel = new GamePanel(game, this::showMenu);
         MenuPanel menuPanel = new MenuPanel(
                 game.getPanelWidth(),
                 game.getPanelHeight(),
@@ -39,6 +39,11 @@ public class GameFrame extends JFrame {
         gamePanel.startGame();
         cardLayout.show(cards, GAME_CARD);
         gamePanel.requestFocusInWindow();
+    }
+
+    private void showMenu() {
+        gamePanel.stopGame();
+        cardLayout.show(cards, MENU_CARD);
     }
 
     private void exitGame() {

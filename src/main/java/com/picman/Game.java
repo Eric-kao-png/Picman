@@ -37,6 +37,7 @@ public class Game {
             return;
         }
 
+        session.tickElapsed();
         session.tickInvincibility();
         session.tickPowered();
         pacman.update(maze);
@@ -98,6 +99,22 @@ public class Game {
 
     public GameStatus getStatus() {
         return session.getStatus();
+    }
+
+    public int getScore() {
+        return session.getScore();
+    }
+
+    public int getPelletsCollected() {
+        return session.getPelletsCollected();
+    }
+
+    public int getGhostsEaten() {
+        return session.getGhostsEaten();
+    }
+
+    public int getElapsedSeconds() {
+        return session.getElapsedSeconds();
     }
 
     public int getPanelWidth() {
