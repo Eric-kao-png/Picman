@@ -1,5 +1,6 @@
 package com.picman.movement;
 
+import com.picman.maze.Walkability;
 import com.picman.model.Maze;
 import com.picman.model.MazeLayout;
 import com.picman.model.entity.GridPosition;
@@ -39,12 +40,12 @@ public final class SideTunnel {
     public static int[] resolveTarget(Maze maze, int col, int row, Direction direction, boolean canBreakWalls) {
         int nextCol = col + direction.dx;
         int nextRow = row + direction.dy;
-        if (isPassable(maze, nextCol, nextRow, canBreakWalls)) {
+        if (Walkability.canEnter(maze, nextCol, nextRow, canBreakWalls)) {
             return new int[]{nextCol, nextRow};
         }
         if (isWrapEdge(col, row, direction)) {
             int wrappedCol = direction == Direction.LEFT ? EAST_COL : WEST_COL;
-            if (isPassable(maze, wrappedCol, row, canBreakWalls)) {
+            if (Walkability.canEnter(maze, wrappedCol, row, canBreakWalls)) {
                 return new int[]{wrappedCol, row};
             }
         }
@@ -57,16 +58,6 @@ public final class SideTunnel {
 
     public static boolean canStep(Maze maze, int col, int row, Direction direction, boolean canBreakWalls) {
         return resolveTarget(maze, col, row, direction, canBreakWalls) != null;
-    }
-
-    private static boolean isPassable(Maze maze, int col, int row, boolean canBreakWalls) {
-        if (maze.isWalkableForPacman(col, row)) {
-            return true;
-        }
-        if (canBreakWalls && maze.canBreakWall(col, row)) {
-            return true;
-        }
-        return maze.isWalkable(col, row);
     }
 
     /** 將超出左右邊界的像素座標折回地圖內（僅在隧道列生效）。 */

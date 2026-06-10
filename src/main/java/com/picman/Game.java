@@ -1,8 +1,8 @@
 package com.picman;
 
+import com.picman.game.CollectibleCollector;
 import com.picman.game.GameCollisionHandler;
 import com.picman.game.ItemSpawnScheduler;
-import com.picman.model.CollectibleType;
 import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
 import com.picman.model.Maze;
@@ -27,6 +27,7 @@ public class Game {
     private final GameRenderer renderer = new GameRenderer();
     private final GameCollisionHandler collisionHandler = new GameCollisionHandler();
     private final ItemSpawnScheduler itemSpawnScheduler = new ItemSpawnScheduler();
+    private final CollectibleCollector collectibleCollector = new CollectibleCollector(itemSpawnScheduler);
 
     public Game() {
         ghostReleaseScheduler.reset(ghosts);
@@ -48,7 +49,7 @@ public class Game {
         GridMovement.ejectFromSolidCell(maze, pacman.getPosition());
 
         itemSpawnScheduler.tick(maze, session);
-        handleCollectibleAtPacman();
+        collectibleCollector.collectAt(maze, pacman, session);
 
         ghostReleaseScheduler.tick(ghosts);
         syncGhostFrightenedState();
@@ -67,27 +68,6 @@ public class Game {
             ghosts.forEach(Ghost::enterFrightened);
         } else {
             ghosts.forEach(Ghost::exitFrightened);
-        }
-    }
-
-    private void handleCollectibleAtPacman() {
-        CollectibleType collected = maze.tryEatCollectible(pacman.getCol(), pacman.getRow());
-        switch (collected) {
-            case COIN -> session.onCoinCollected();
-            case POWER_COIN -> {
-                session.onPowerCoinCollected();
-                itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
-            }
-            case EXTRA_LIFE_ITEM -> {
-                session.onExtraLifeCollected();
-                itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
-            }
-            case PICKAXE_ITEM -> {
-                session.onPickaxeCollected();
-                itemSpawnScheduler.onItemCollected(pacman.getCol(), pacman.getRow());
-            }
-            case NONE -> {
-            }
         }
     }
 

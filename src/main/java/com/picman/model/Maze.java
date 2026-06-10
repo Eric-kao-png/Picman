@@ -83,28 +83,13 @@ public class Maze {
         if (!inBounds(col, row)) {
             return CollectibleType.NONE;
         }
-        CellType cell = getCellType(col, row);
-        if (cell == CellType.COIN) {
-            grid[row][col] = CellType.EMPTY.getCode();
-            return CollectibleType.COIN;
-        }
-        if (cell == CellType.POWER_COIN) {
-            grid[row][col] = CellType.EMPTY.getCode();
-            return CollectibleType.POWER_COIN;
-        }
-        if (cell == CellType.EXTRA_LIFE_ITEM) {
-            grid[row][col] = CellType.EMPTY.getCode();
-            return CollectibleType.EXTRA_LIFE_ITEM;
-        }
-        if (cell == CellType.TEMP_POWER_COIN) {
-            grid[row][col] = CellType.EMPTY.getCode();
-            return CollectibleType.POWER_COIN;
-        }
-        if (cell == CellType.PICKAXE_ITEM) {
-            grid[row][col] = CellType.EMPTY.getCode();
-            return CollectibleType.PICKAXE_ITEM;
-        }
-        return CollectibleType.NONE;
+        return getCellType(col, row)
+                .asCollectible()
+                .map(collectible -> {
+                    grid[row][col] = CellType.EMPTY.getCode();
+                    return collectible;
+                })
+                .orElse(CollectibleType.NONE);
     }
 
     public boolean placeSpawnedItem(int col, int row, CellType itemType) {

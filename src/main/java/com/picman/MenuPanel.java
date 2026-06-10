@@ -1,6 +1,8 @@
 package com.picman;
 
 import com.picman.config.RenderTheme;
+import com.picman.render.DecorativeSprites;
+import com.picman.render.UiDraw;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -10,7 +12,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -24,7 +25,6 @@ public class MenuPanel extends JPanel {
     }
 
     private static final Color MENU_BACKGROUND = new Color(3, 5, 18);
-    private static final Color MAZE_BLUE = RenderTheme.WALL;
     private static final Color NEON_BLUE = new Color(64, 158, 255);
     private static final Color DEEP_BLUE = new Color(7, 17, 55);
     private static final Color BUTTON_BLUE = new Color(10, 30, 92);
@@ -32,6 +32,7 @@ public class MenuPanel extends JPanel {
     private static final Color MENU_YELLOW = RenderTheme.PACMAN;
     private static final Color TEXT_WHITE = new Color(245, 248, 255);
     private static final Color MUTED_TEXT = new Color(178, 204, 255);
+    private static final Color PELLET_COLOR = new Color(255, 236, 170);
 
     private static final Font TITLE_FONT = new Font("Arial Black", Font.BOLD, 48);
     private static final Font HELP_TITLE_FONT = new Font("SansSerif", Font.BOLD, 34);
@@ -174,8 +175,8 @@ public class MenuPanel extends JPanel {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(BUTTON_BLUE);
                 button.setForeground(primary ? MENU_YELLOW : TEXT_WHITE);
+                button.setBackground(BUTTON_BLUE);
                 button.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(primary ? MENU_YELLOW : NEON_BLUE, 2),
                         BorderFactory.createEmptyBorder(8, 24, 8, 24)
@@ -191,22 +192,22 @@ public class MenuPanel extends JPanel {
         int pacmanX = centerX - pacmanSize / 2;
         int pacmanY = Math.max(52, getHeight() / 10);
 
-        drawPacman(g2, pacmanX, pacmanY, pacmanSize);
-        drawCenteredText(g2, "PAC-MAN", TITLE_FONT, MENU_YELLOW, centerX, pacmanY + pacmanSize + 54);
-        drawCenteredText(g2, "READY!", HINT_FONT, MUTED_TEXT, centerX, pacmanY + pacmanSize + 82);
+        DecorativeSprites.drawMenuPacman(g2, pacmanX, pacmanY, pacmanSize, MENU_YELLOW, MENU_BACKGROUND);
+        UiDraw.drawCenteredText(g2, "PAC-MAN", TITLE_FONT, MENU_YELLOW, centerX, pacmanY + pacmanSize + 54);
+        UiDraw.drawCenteredText(g2, "READY!", HINT_FONT, MUTED_TEXT, centerX, pacmanY + pacmanSize + 82);
 
         int dotY = Math.min(getHeight() - 252, pacmanY + pacmanSize + 114);
-        drawPelletLine(g2, 58, getWidth() - 58, dotY);
-        drawGhost(g2, getWidth() - 96, dotY - 21, new Color(255, 76, 76));
-        drawGhost(g2, 66, dotY - 21, new Color(0, 220, 255));
+        DecorativeSprites.drawPelletLine(g2, 58, getWidth() - 58, dotY, PELLET_COLOR);
+        DecorativeSprites.drawSmallGhost(g2, getWidth() - 96, dotY - 21, new Color(255, 76, 76));
+        DecorativeSprites.drawSmallGhost(g2, 66, dotY - 21, new Color(0, 220, 255));
     }
 
     private void drawHelpMenu(Graphics2D g2) {
         int centerX = getWidth() / 2;
         int titleY = Math.max(92, getHeight() / 5);
 
-        drawCenteredText(g2, "遊戲說明", HELP_TITLE_FONT, MENU_YELLOW, centerX, titleY);
-        drawPelletLine(g2, 96, getWidth() - 96, titleY + 34);
+        UiDraw.drawCenteredText(g2, "遊戲說明", HELP_TITLE_FONT, MENU_YELLOW, centerX, titleY);
+        DecorativeSprites.drawPelletLine(g2, 96, getWidth() - 96, titleY + 34, PELLET_COLOR);
 
         String[] rules = {
                 "1. 使用方向鍵移動",
@@ -215,18 +216,18 @@ public class MenuPanel extends JPanel {
         };
 
         g2.setFont(HELP_FONT);
-        FontMetrics metrics = g2.getFontMetrics();
-        int lineHeight = metrics.getHeight() + 13;
+        int lineHeight = g2.getFontMetrics().getHeight() + 13;
         int firstLineY = titleY + 92;
 
         for (int i = 0; i < rules.length; i++) {
-            int y = firstLineY + i * lineHeight;
-            drawCenteredText(g2, rules[i], HELP_FONT, TEXT_WHITE, centerX, y);
+            UiDraw.drawCenteredText(g2, rules[i], HELP_FONT, TEXT_WHITE, centerX, firstLineY + i * lineHeight);
         }
 
         int iconSize = 34;
-        drawPacman(g2, centerX - 72, firstLineY + lineHeight * rules.length + 18, iconSize);
-        drawGhost(g2, centerX + 38, firstLineY + lineHeight * rules.length + 16, new Color(255, 105, 180));
+        DecorativeSprites.drawMenuPacman(
+                g2, centerX - 72, firstLineY + lineHeight * rules.length + 18, iconSize, MENU_YELLOW, MENU_BACKGROUND);
+        DecorativeSprites.drawSmallGhost(
+                g2, centerX + 38, firstLineY + lineHeight * rules.length + 16, new Color(255, 105, 180));
     }
 
     private void drawMazeBackground(Graphics2D g2) {
@@ -260,46 +261,5 @@ public class MenuPanel extends JPanel {
         g2.setStroke(new BasicStroke(2f));
         g2.setColor(NEON_BLUE);
         g2.drawRoundRect(margin + 8, margin + 8, width - 16, height - 16, 14, 14);
-    }
-
-    private void drawPelletLine(Graphics2D g2, int startX, int endX, int y) {
-        g2.setColor(new Color(255, 236, 170));
-        for (int x = startX; x <= endX; x += 24) {
-            g2.fillOval(x, y, 5, 5);
-        }
-    }
-
-    private void drawPacman(Graphics2D g2, int x, int y, int size) {
-        g2.setColor(MENU_YELLOW);
-        g2.fillArc(x, y, size, size, 35, 290);
-
-        g2.setColor(MENU_BACKGROUND);
-        int eyeSize = Math.max(5, size / 9);
-        g2.fillOval(x + size * 58 / 100, y + size * 22 / 100, eyeSize, eyeSize);
-    }
-
-    private void drawGhost(Graphics2D g2, int x, int y, Color color) {
-        int width = 30;
-        int height = 34;
-
-        g2.setColor(color);
-        g2.fillRoundRect(x, y, width, height, 16, 16);
-        g2.fillRect(x, y + height / 2, width, height / 2);
-
-        g2.setColor(Color.WHITE);
-        g2.fillOval(x + 6, y + 10, 7, 8);
-        g2.fillOval(x + 18, y + 10, 7, 8);
-
-        g2.setColor(Color.BLACK);
-        g2.fillOval(x + 9, y + 13, 3, 3);
-        g2.fillOval(x + 21, y + 13, 3, 3);
-    }
-
-    private void drawCenteredText(Graphics2D g2, String text, Font font, Color color, int centerX, int baselineY) {
-        g2.setFont(font);
-        g2.setColor(color);
-        FontMetrics metrics = g2.getFontMetrics();
-        int x = centerX - metrics.stringWidth(text) / 2;
-        g2.drawString(text, x, baselineY);
     }
 }

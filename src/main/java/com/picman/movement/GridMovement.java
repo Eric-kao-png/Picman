@@ -1,6 +1,7 @@
 package com.picman.movement;
 
 import com.picman.config.GameConfig;
+import com.picman.maze.Walkability;
 import com.picman.model.Maze;
 import com.picman.model.entity.GridPosition;
 import com.picman.util.Direction;
@@ -17,8 +18,10 @@ public final class GridMovement {
         if (dir == null) {
             return false;
         }
-        return isPassable(maze, col, row, canBreakWalls)
-                && SideTunnel.canStep(maze, col, row, dir, canBreakWalls);
+        boolean onValidCell = canBreakWalls
+                ? Walkability.isOccupiableForPacman(maze, col, row)
+                : Walkability.isOccupiableForGhost(maze, col, row);
+        return onValidCell && SideTunnel.canStep(maze, col, row, dir, canBreakWalls);
     }
 
     public static boolean canTurn(GridPosition position, Direction current, Direction desired, Maze maze) {
@@ -36,16 +39,14 @@ public final class GridMovement {
         }
         int col = position.getCol();
         int row = position.getRow();
-        if (!isOccupiable(maze, col, row)
+        if (!Walkability.isOccupiableForPacman(maze, col, row)
                 || !SideTunnel.canStep(maze, col, row, desired, canBreakWalls)) {
             return false;
         }
         if (current == null || current == desired) {
             return true;
         }
-        boolean currentHorizontal = current.isHorizontal();
-        boolean desiredHorizontal = desired.isHorizontal();
-        if (currentHorizontal == desiredHorizontal) {
+        if (current.isHorizontal() == desired.isHorizontal()) {
             return true;
         }
         return GridMath.isPerpendicularAligned(position.getCenterX(), position.getCenterY(), current);
@@ -56,11 +57,19 @@ public final class GridMovement {
     }
 
     public static boolean movePacman(Maze maze, GridPosition position, Direction dir, boolean canBreakWalls) {
-        return move(maze, position, dir, GameConfig.PACMAN_SPEED, true, canBreakWalls);
+        return move(maze, position, dir, GameConfig.PACMAN_SPEED, true, canBreakWalls, true);
     }
 
     public static boolean moveGhost(Maze maze, GridPosition position, Direction dir) {
-        return move(maze, position, dir, GameConfig.GHOST_SPEED, false, false);
+        return move(maze, position, dir, GameConfig.GHOST_SPEED, false, false, false);
+    }
+
+    /** 將 Pac-Man 從實心牆格彈出至最近可走格。 */
+    public static void ejectFromSolidCell(Maze maze, GridPosition position) {
+        if (Walkability.isOccupiableForPacman(maze, position.getCol(), position.getRow())) {
+            return;
+        }
+        snapToNearestWalkable(maze, position, true);
     }
 
     private static boolean move(
@@ -69,7 +78,8 @@ public final class GridMovement {
             Direction dir,
             double speed,
             boolean alignInCorridor,
-            boolean canBreakWalls) {
+            boolean canBreakWalls,
+            boolean pacman) {
         if (dir == null) {
             return false;
         }
@@ -77,13 +87,13 @@ public final class GridMovement {
         int col = position.getCol();
         int row = position.getRow();
 
-        if (!isOccupiable(maze, col, row)) {
-            snapToNearestWalkable(maze, position);
+        if (!isOccupiable(maze, col, row, pacman)) {
+            snapToNearestWalkable(maze, position, pacman);
             return false;
         }
 
         if (SideTunnel.isWrapEdge(col, row, dir)) {
-            return moveThroughWrapEdge(maze, position, dir, speed, alignInCorridor, canBreakWalls);
+            return moveThroughWrapEdge(maze, position, dir, speed, alignInCorridor, pacman);
         }
 
         int[] target = SideTunnel.resolveTarget(maze, col, row, dir, canBreakWalls);
@@ -99,8 +109,8 @@ public final class GridMovement {
             alignInCorridor(position, dir, speed);
             col = position.getCol();
             row = position.getRow();
-            if (!isOccupiable(maze, col, row)) {
-                snapToNearestWalkable(maze, position);
+            if (!isOccupiable(maze, col, row, pacman)) {
+                snapToNearestWalkable(maze, position, pacman);
                 return false;
             }
             target = SideTunnel.resolveTarget(maze, col, row, dir, canBreakWalls);
@@ -112,17 +122,33 @@ public final class GridMovement {
             nextRow = target[1];
         }
 
-        if (canBreakWalls && maze.canBreakWall(nextCol, nextRow)) {
-            maze.breakWall(nextCol, nextRow);
-        }
+        breakWallIfNeeded(maze, nextCol, nextRow, canBreakWalls);
+        return advanceTowardTarget(maze, position, dir, speed, col, row, nextCol, nextRow, pacman);
+    }
 
+    private static void breakWallIfNeeded(Maze maze, int col, int row, boolean canBreakWalls) {
+        if (canBreakWalls && maze.canBreakWall(col, row)) {
+            maze.breakWall(col, row);
+        }
+    }
+
+    private static boolean advanceTowardTarget(
+            Maze maze,
+            GridPosition position,
+            Direction dir,
+            double speed,
+            int fromCol,
+            int fromRow,
+            int nextCol,
+            int nextRow,
+            boolean pacman) {
         double nextX = position.getCenterX() + dir.dx * speed;
         double nextY = position.getCenterY() + dir.dy * speed;
         nextX = capAlongAxis(nextX, dir.dx, nextCol);
         nextY = capAlongAxis(nextY, dir.dy, nextRow);
 
-        if (!isOccupiable(maze, GridMath.cellIndex(nextX), GridMath.cellIndex(nextY))) {
-            position.snapToCell(col, row);
+        if (!isOccupiable(maze, GridMath.cellIndex(nextX), GridMath.cellIndex(nextY), pacman)) {
+            position.snapToCell(fromCol, fromRow);
             return false;
         }
 
@@ -136,37 +162,23 @@ public final class GridMovement {
             Direction dir,
             double speed,
             boolean alignInCorridor,
-            boolean canBreakWalls) {
+            boolean pacman) {
         if (alignInCorridor && dir.isHorizontal()) {
             int row = position.getRow();
             position.setCenterY(nudgeToward(position.getCenterY(), GridMath.cellCenter(row), speed));
         }
 
         double nextX = position.getCenterX() + dir.dx * speed;
-        double nextY = position.getCenterY();
-        position.setCenter(nextX, nextY);
+        position.setCenter(nextX, position.getCenterY());
         SideTunnel.wrapPositionHorizontally(position);
 
-        return isOccupiable(maze, position.getCol(), position.getRow());
+        return isOccupiable(maze, position.getCol(), position.getRow(), pacman);
     }
 
-    /** 將 Pac-Man 從實心牆格彈出至最近可走格。 */
-    public static void ejectFromSolidCell(Maze maze, GridPosition position) {
-        if (isOccupiable(maze, position.getCol(), position.getRow())) {
-            return;
-        }
-        snapToNearestWalkable(maze, position);
-    }
-
-    private static boolean isOccupiable(Maze maze, int col, int row) {
-        return maze.isWalkableForPacman(col, row);
-    }
-
-    private static boolean isPassable(Maze maze, int col, int row, boolean canBreakWalls) {
-        if (maze.isWalkableForPacman(col, row)) {
-            return true;
-        }
-        return canBreakWalls && maze.canBreakWall(col, row);
+    private static boolean isOccupiable(Maze maze, int col, int row, boolean pacman) {
+        return pacman
+                ? Walkability.isOccupiableForPacman(maze, col, row)
+                : Walkability.isOccupiableForGhost(maze, col, row);
     }
 
     private static void alignInCorridor(GridPosition position, Direction moveDir, double speed) {
@@ -198,10 +210,10 @@ public final class GridMovement {
         return current + Math.signum(diff) * maxDelta;
     }
 
-    private static void snapToNearestWalkable(Maze maze, GridPosition position) {
+    private static void snapToNearestWalkable(Maze maze, GridPosition position, boolean pacman) {
         int col = position.getCol();
         int row = position.getRow();
-        if (isOccupiable(maze, col, row)) {
+        if (isOccupiable(maze, col, row, pacman)) {
             position.snapToCell(col, row);
             return;
         }
@@ -209,7 +221,7 @@ public final class GridMovement {
         for (int radius = 1; radius <= maxRadius; radius++) {
             for (int dc = -radius; dc <= radius; dc++) {
                 for (int dr = -radius; dr <= radius; dr++) {
-                    if (isOccupiable(maze, col + dc, row + dr)) {
+                    if (isOccupiable(maze, col + dc, row + dr, pacman)) {
                         position.snapToCell(col + dc, row + dr);
                         return;
                     }

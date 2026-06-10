@@ -67,9 +67,7 @@ public class GhostReleaseScheduler {
         }
 
         Ghost ghost = ghosts.get(index);
-        if (ghost.getMode() == GhostMode.WAITING && ghost.isPendingRespawn()) {
-            ghost.releaseFromHouse();
-        } else if (ghost.getMode() == GhostMode.WAITING) {
+        if (ghost.getMode() == GhostMode.WAITING) {
             ghost.releaseFromHouse();
         }
 

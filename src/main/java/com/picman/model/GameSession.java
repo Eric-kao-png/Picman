@@ -61,21 +61,19 @@ public class GameSession {
     }
 
     public void tickInvincibility() {
-        if (invincibleTicks > 0) {
-            invincibleTicks--;
-        }
+        invincibleTicks = decrement(invincibleTicks);
     }
 
     public void tickPowered() {
-        if (poweredTicks > 0) {
-            poweredTicks--;
-        }
+        poweredTicks = decrement(poweredTicks);
     }
 
     public void tickPickaxe() {
-        if (pickaxeTicks > 0) {
-            pickaxeTicks--;
-        }
+        pickaxeTicks = decrement(pickaxeTicks);
+    }
+
+    private static int decrement(int ticks) {
+        return ticks > 0 ? ticks - 1 : 0;
     }
 
     public void tickElapsed() {
