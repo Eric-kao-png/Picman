@@ -10,7 +10,7 @@ import com.picman.model.entity.Pacman;
 import java.util.List;
 
 /**
- * 處理 Pac-Man 與幽靈碰撞：Powered 時吃幽靈，否則被幽靈撞到扣命。
+ * 處理 Pac-Man 與幽靈碰撞：Powered 時可吃受驚幽靈，其餘情況下非受驚幽靈會扣命。
  */
 public class GameCollisionHandler {
     public void resolve(
@@ -20,7 +20,6 @@ public class GameCollisionHandler {
             GhostReleaseScheduler releaseScheduler) {
         if (session.isPowered()) {
             resolvePoweredCollisions(pacman, ghosts, session, releaseScheduler);
-            return;
         }
 
         if (session.isInvincible()) {
@@ -29,7 +28,7 @@ public class GameCollisionHandler {
 
         boolean hit = ghosts.stream()
                 .filter(Ghost::isActiveForCollision)
-                .filter(ghost -> !ghost.isEdibleByPacman())
+                .filter(ghost -> !(session.isPowered() && ghost.isEdibleByPacman()))
                 .anyMatch(ghost -> CollisionDetector.entitiesOverlap(
                         ghost.getPosition(),
                         pacman.getPosition()));

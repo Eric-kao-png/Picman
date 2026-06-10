@@ -37,8 +37,6 @@ public class Game {
             return;
         }
 
-        boolean wasPowered = session.isPowered();
-
         session.tickInvincibility();
         session.tickPowered();
         pacman.update(maze);
@@ -46,13 +44,8 @@ public class Game {
         itemSpawnScheduler.tick(maze, session);
         handleCollectibleAtPacman();
 
-        if (!wasPowered && session.isPowered()) {
-            ghosts.forEach(Ghost::enterFrightened);
-        } else if (wasPowered && !session.isPowered()) {
-            ghosts.forEach(Ghost::exitFrightened);
-        }
-
         ghostReleaseScheduler.tick(ghosts);
+        syncGhostFrightenedState();
         for (Ghost ghost : ghosts) {
             ghost.update(maze, pacman, ghosts);
         }
@@ -60,6 +53,14 @@ public class Game {
 
         if (maze.noCoinsLeft()) {
             session.onAllCoinsCollected();
+        }
+    }
+
+    private void syncGhostFrightenedState() {
+        if (session.isPowered()) {
+            ghosts.forEach(Ghost::enterFrightened);
+        } else {
+            ghosts.forEach(Ghost::exitFrightened);
         }
     }
 
