@@ -47,8 +47,12 @@ public final class MazePathfinder {
             int steps = distances[row][col];
 
             for (Direction direction : Direction.values()) {
-                int nextCol = col + direction.dx;
-                int nextRow = row + direction.dy;
+                int[] target = SideTunnel.resolveTarget(maze, col, row, direction);
+                if (target == null) {
+                    continue;
+                }
+                int nextCol = target[0];
+                int nextRow = target[1];
                 if (!maze.isWalkable(nextCol, nextRow)) {
                     continue;
                 }

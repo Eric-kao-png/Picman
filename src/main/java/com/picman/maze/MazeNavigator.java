@@ -1,6 +1,7 @@
 package com.picman.maze;
 
 import com.picman.model.Maze;
+import com.picman.movement.SideTunnel;
 import com.picman.util.Direction;
 
 import java.util.ArrayList;
@@ -28,14 +29,14 @@ public final class MazeNavigator {
             if (excludeReverse && current != null && direction == current.opposite()) {
                 continue;
             }
-            if (maze.isWalkable(col + direction.dx, row + direction.dy)) {
+            if (SideTunnel.canStep(maze, col, row, direction)) {
                 options.add(direction);
             }
         }
 
         if (options.isEmpty() && current != null) {
             Direction reverse = current.opposite();
-            if (maze.isWalkable(col + reverse.dx, row + reverse.dy)) {
+            if (SideTunnel.canStep(maze, col, row, reverse)) {
                 options.add(reverse);
             }
         }
@@ -45,7 +46,7 @@ public final class MazeNavigator {
     private static int countWalkableNeighbors(Maze maze, int col, int row) {
         int count = 0;
         for (Direction direction : Direction.values()) {
-            if (maze.isWalkable(col + direction.dx, row + direction.dy)) {
+            if (SideTunnel.canStep(maze, col, row, direction)) {
                 count++;
             }
         }

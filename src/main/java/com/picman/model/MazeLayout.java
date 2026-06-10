@@ -4,6 +4,11 @@ package com.picman.model;
  * 地圖模板資料。0 = 可走，1 = 牆。
  */
 public final class MazeLayout {
+    /** 地圖欄數（col，對應 {@link com.picman.model.Maze#getWidth()}） */
+    public static final int WIDTH = 28;
+    /** 地圖列數（row，對應 {@link com.picman.model.Maze#getHeight()}） */
+    public static final int HEIGHT = 30;
+
     private MazeLayout() {
     }
 
@@ -39,4 +44,17 @@ public final class MazeLayout {
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     };
+
+    static {
+        if (RAW.length != HEIGHT) {
+            throw new IllegalStateException(
+                    "MazeLayout.RAW row count " + RAW.length + " != HEIGHT " + HEIGHT);
+        }
+        for (int row = 0; row < RAW.length; row++) {
+            if (RAW[row].length != WIDTH) {
+                throw new IllegalStateException(
+                        "MazeLayout.RAW row " + row + " col count " + RAW[row].length + " != WIDTH " + WIDTH);
+            }
+        }
+    }
 }

@@ -13,7 +13,7 @@ public final class GridMovement {
         if (dir == null) {
             return false;
         }
-        return maze.isWalkable(col, row) && maze.isWalkable(col + dir.dx, row + dir.dy);
+        return maze.isWalkable(col, row) && SideTunnel.canStep(maze, col, row, dir);
     }
 
     public static boolean canTurn(GridPosition position, Direction current, Direction desired, Maze maze) {
@@ -22,7 +22,7 @@ public final class GridMovement {
         }
         int col = position.getCol();
         int row = position.getRow();
-        if (!maze.isWalkable(col, row) || !maze.isWalkable(col + desired.dx, row + desired.dy)) {
+        if (!maze.isWalkable(col, row) || !SideTunnel.canStep(maze, col, row, desired)) {
             return false;
         }
         if (current == null || current == desired) {
@@ -57,12 +57,18 @@ public final class GridMovement {
             return false;
         }
 
-        int nextCol = col + dir.dx;
-        int nextRow = row + dir.dy;
-        if (!maze.isWalkable(nextCol, nextRow)) {
+        if (SideTunnel.isWrapEdge(col, row, dir)) {
+            return moveThroughWrapEdge(maze, position, dir, speed, alignInCorridor);
+        }
+
+        int[] target = SideTunnel.resolveTarget(maze, col, row, dir);
+        if (target == null) {
             position.snapToCell(col, row);
             return false;
         }
+
+        int nextCol = target[0];
+        int nextRow = target[1];
 
         if (alignInCorridor) {
             alignInCorridor(position, dir, speed);
@@ -72,12 +78,13 @@ public final class GridMovement {
                 snapToNearestWalkable(maze, position);
                 return false;
             }
-            nextCol = col + dir.dx;
-            nextRow = row + dir.dy;
-            if (!maze.isWalkable(nextCol, nextRow)) {
+            target = SideTunnel.resolveTarget(maze, col, row, dir);
+            if (target == null) {
                 position.snapToCell(col, row);
                 return false;
             }
+            nextCol = target[0];
+            nextRow = target[1];
         }
 
         double nextX = position.getCenterX() + dir.dx * speed;
@@ -92,6 +99,25 @@ public final class GridMovement {
 
         position.setCenter(nextX, nextY);
         return true;
+    }
+
+    private static boolean moveThroughWrapEdge(
+            Maze maze,
+            GridPosition position,
+            Direction dir,
+            double speed,
+            boolean alignInCorridor) {
+        if (alignInCorridor && dir.isHorizontal()) {
+            int row = position.getRow();
+            position.setCenterY(nudgeToward(position.getCenterY(), GridMath.cellCenter(row), speed));
+        }
+
+        double nextX = position.getCenterX() + dir.dx * speed;
+        double nextY = position.getCenterY();
+        position.setCenter(nextX, nextY);
+        SideTunnel.wrapPositionHorizontally(position);
+
+        return maze.isWalkable(position.getCol(), position.getRow());
     }
 
     private static void alignInCorridor(GridPosition position, Direction moveDir, double speed) {
