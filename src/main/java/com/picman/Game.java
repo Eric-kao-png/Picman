@@ -6,10 +6,12 @@ import com.picman.game.ItemSpawnScheduler;
 import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
 import com.picman.model.Maze;
+import com.picman.model.entity.GhostKind;
 import com.picman.model.entity.GhostReleaseScheduler;
+import com.picman.model.entity.GhostSpawnInfo;
 import com.picman.model.entity.Pacman;
 import com.picman.model.entity.ghost.Ghost;
-import com.picman.model.entity.ghostfactory.GhostAssembly;
+import com.picman.model.entity.ghostFactory.GhostAssembly;
 import com.picman.render.GameRenderer;
 import com.picman.render.ViewLayout;
 import com.picman.movement.GridMovement;
@@ -19,6 +21,11 @@ import java.awt.Graphics2D;
 import java.util.List;
 
 public class Game {
+    static {
+        // 初始化預設幽靈到註冊表
+        GhostSpawnInfo.initializeDefaultGhosts();
+    }
+
     private final Maze maze = new Maze();
     private final Pacman pacman = new Pacman();
     private final List<Ghost> ghosts = GhostAssembly.createAll();
@@ -52,6 +59,7 @@ public class Game {
         collectibleCollector.collectAt(maze, pacman, session);
 
         ghostReleaseScheduler.tick(ghosts);
+        releaseWhiteGhostIfScoreThreshold();
         syncGhostFrightenedState();
         for (Ghost ghost : ghosts) {
             ghost.update(maze, pacman, ghosts);
@@ -68,6 +76,22 @@ public class Game {
             ghosts.forEach(Ghost::enterFrightened);
         } else {
             ghosts.forEach(Ghost::exitFrightened);
+        }
+    }
+
+    /**
+     * 當分數 > 2000 時釋放白色幽靈。
+     */
+    private void releaseWhiteGhostIfScoreThreshold() {
+        if (session.getScore() > 2000) {
+            int whiteGhostIndex = GhostKind.index(GhostKind.WHITE);
+            if (whiteGhostIndex >= 0 && whiteGhostIndex < ghosts.size()) {
+                Ghost whiteGhost = ghosts.get(whiteGhostIndex);
+                // 只在幽靈還在等待時釋放
+                if (whiteGhost.getMode() == com.picman.model.entity.GhostMode.WAITING) {
+                    whiteGhost.releaseFromHouse();
+                }
+            }
         }
     }
 

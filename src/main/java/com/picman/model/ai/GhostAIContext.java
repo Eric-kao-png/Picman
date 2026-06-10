@@ -15,6 +15,6 @@ public record GhostAIContext(Pacman pacman, List<Ghost> ghosts) {
     }
 
     public Ghost redGhost() {
-        return ghosts.get(GhostKind.RED.index());
+        return ghosts.get(GhostKind.index(GhostKind.RED));
     }
 }

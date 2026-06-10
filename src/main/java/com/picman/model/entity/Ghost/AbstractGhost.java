@@ -144,4 +144,33 @@ abstract class AbstractGhost implements Ghost {
     private void setDirection(Direction next) {
         direction = next;
     }
+
+    // 為子類提供的受保護方法
+    protected Direction getDirectionProtected() {
+        return direction;
+    }
+
+    protected void setDirectionProtected(Direction next) {
+        direction = next;
+    }
+
+    protected void setModeProtected(GhostMode newMode) {
+        mode = newMode;
+    }
+
+    protected GhostAI getAIProtected() {
+        return ai;
+    }
+
+    protected GhostAI getFrightenedAIProtected() {
+        return frightenedAi;
+    }
+
+    protected int getSpawnColProtected() {
+        return spawnCol;
+    }
+
+    protected int getSpawnRowProtected() {
+        return spawnRow;
+    }
 }

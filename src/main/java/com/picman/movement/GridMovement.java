@@ -64,6 +64,10 @@ public final class GridMovement {
         return move(maze, position, dir, GameConfig.GHOST_SPEED, false, false, false);
     }
 
+    public static boolean moveGhostWithSpeed(Maze maze, GridPosition position, Direction dir, double speed) {
+        return move(maze, position, dir, speed, false, false, false);
+    }
+
     /** 將 Pac-Man 從實心牆格彈出至最近可走格。 */
     public static void ejectFromSolidCell(Maze maze, GridPosition position) {
         if (Walkability.isOccupiableForPacman(maze, position.getCol(), position.getRow())) {

@@ -10,6 +10,7 @@ public final class GameConfig {
 
     public static final double PACMAN_SPEED = 2.5;
     public static final double GHOST_SPEED = 1.25;
+    public static final double GHOST_SPEED_FAST = 1.875; // 1.25 * 1.5
     public static final int ALIGN_THRESHOLD = 4;
 
     public static final int INITIAL_LIVES = 3;
