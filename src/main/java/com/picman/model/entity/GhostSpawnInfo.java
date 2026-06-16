@@ -32,7 +32,10 @@ public final class GhostSpawnInfo {
      */
     public static void initializeDefaultGhosts() {
         GhostRegistry registry = GhostRegistry.getInstance();
-        
+        if (!registry.getAllGhostNames().isEmpty()) {
+            return;
+        }
+
         registry.registerGhost(
                 GhostKind.RED,
                 ALL.get(0),
