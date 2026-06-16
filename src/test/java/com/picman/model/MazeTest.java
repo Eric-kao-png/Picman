@@ -92,4 +92,50 @@ class MazeTest {
         assertFalse(maze.placeSpawnedItem(COIN_COL, COIN_ROW, CellType.PICKAXE_ITEM));
         assertEquals(CellType.COIN, maze.getCellType(COIN_COL, COIN_ROW));
     }
+
+    @Test
+    void noCoinsLeft_falseWhenCoinsRemain() {
+        assertFalse(maze.noCoinsLeft());
+    }
+
+    @Test
+    void noCoinsLeft_trueAfterAllCoinsEaten() {
+        eatAllCoins();
+
+        assertTrue(maze.noCoinsLeft());
+    }
+
+    @Test
+    void noCoinsLeft_ignoresPowerCoinsAndSpawnedItems() {
+        eatAllCoins();
+
+        int col = PowerCoinConfig.POSITIONS[0][0];
+        int row = PowerCoinConfig.POSITIONS[0][1];
+        assertTrue(maze.placeSpawnedItem(EMPTY_COL, EMPTY_ROW, CellType.PICKAXE_ITEM));
+
+        assertEquals(CellType.POWER_COIN, maze.getCellType(col, row));
+        assertEquals(CellType.PICKAXE_ITEM, maze.getCellType(EMPTY_COL, EMPTY_ROW));
+        assertTrue(maze.noCoinsLeft());
+    }
+
+    @Test
+    void noCoinsLeft_resetRestoresCoins() {
+        eatAllCoins();
+        assertTrue(maze.noCoinsLeft());
+
+        maze.reset();
+
+        assertFalse(maze.noCoinsLeft());
+        assertEquals(CellType.COIN, maze.getCellType(COIN_COL, COIN_ROW));
+    }
+
+    private void eatAllCoins() {
+        for (int row = 0; row < maze.getHeight(); row++) {
+            for (int col = 0; col < maze.getWidth(); col++) {
+                if (maze.getCellType(col, row) == CellType.COIN) {
+                    maze.tryEatCollectible(col, row);
+                }
+            }
+        }
+    }
 }
