@@ -1,117 +1,82 @@
 package com.picman;
 
 import com.picman.game.CollectibleCollector;
-import com.picman.game.GameCollisionHandler;
+import com.picman.game.GameLoop;
+import com.picman.game.GameWorld;
 import com.picman.game.ItemSpawnScheduler;
 import com.picman.model.GameSession;
 import com.picman.model.GameStatus;
-import com.picman.model.Maze;
-import com.picman.model.entity.GhostKind;
 import com.picman.model.entity.GhostReleaseScheduler;
 import com.picman.model.entity.GhostSpawnInfo;
-import com.picman.model.entity.Pacman;
-import com.picman.model.entity.ghost.Ghost;
-import com.picman.model.entity.ghostFactory.GhostAssembly;
 import com.picman.render.GameRenderer;
 import com.picman.render.ViewLayout;
-import com.picman.movement.GridMovement;
 import com.picman.util.Direction;
 
 import java.awt.Graphics2D;
-import java.util.List;
 
+/**
+ * 遊戲 Facade：對外提供簡潔的操作介面，對內 delegate 給各子系統。
+ *
+ * <p>此類不包含任何遊戲邏輯本身，所有細節由以下子系統負責：
+ * <ul>
+ *   <li>{@link GameWorld}             — 持有所有遊戲實體（maze、pacman、ghosts）</li>
+ *   <li>{@link GameLoop}              — 每 tick 的完整更新管線</li>
+ *   <li>{@link com.picman.game.GhostOrchestrator} — 幽靈狀態同步與 AI 更新</li>
+ *   <li>{@link com.picman.game.GameCollisionHandler} — 碰撞解算</li>
+ *   <li>{@link ItemSpawnScheduler}    — 道具生成排程</li>
+ *   <li>{@link CollectibleCollector}  — 收集物副作用</li>
+ *   <li>{@link GameSession}           — 分數、生命、計時等場次狀態</li>
+ *   <li>{@link GameRenderer}          — 繪製</li>
+ * </ul>
+ */
 public class Game {
     static {
-        // 初始化預設幽靈到註冊表
         GhostSpawnInfo.initializeDefaultGhosts();
     }
 
-    private final Maze maze = new Maze();
-    private final Pacman pacman = new Pacman();
-    private final List<Ghost> ghosts = GhostAssembly.createAll();
+    private final GameWorld world = new GameWorld();
     private final GhostReleaseScheduler ghostReleaseScheduler = new GhostReleaseScheduler();
     private final GameSession session = new GameSession();
-    private final GameRenderer renderer = new GameRenderer();
-    private final GameCollisionHandler collisionHandler = new GameCollisionHandler();
     private final ItemSpawnScheduler itemSpawnScheduler = new ItemSpawnScheduler();
     private final CollectibleCollector collectibleCollector = new CollectibleCollector(itemSpawnScheduler);
+    private final GameLoop gameLoop = new GameLoop();
+    private final GameRenderer renderer = new GameRenderer();
 
     public Game() {
-        ghostReleaseScheduler.reset(ghosts);
+        ghostReleaseScheduler.reset(world.getGhosts());
         itemSpawnScheduler.reset();
     }
 
+    // ── 更新 ──────────────────────────────────────────────────────────────────
+
     public void update() {
-        if (!session.isPlaying()) {
-            return;
-        }
-
-        session.tickElapsed();
-        session.tickInvincibility();
-        session.tickPowered();
-        session.tickPickaxe();
-        maze.tickBrokenWalls();
-        GridMovement.ejectFromSolidCell(maze, pacman.getPosition());
-        pacman.update(maze, session.isPickaxeActive());
-        GridMovement.ejectFromSolidCell(maze, pacman.getPosition());
-
-        itemSpawnScheduler.tick(maze, session);
-        collectibleCollector.collectAt(maze, pacman, session);
-
-        ghostReleaseScheduler.tick(ghosts);
-        releaseWhiteGhostIfScoreThreshold();
-        syncGhostFrightenedState();
-        for (Ghost ghost : ghosts) {
-            ghost.update(maze, pacman, ghosts);
-        }
-        collisionHandler.resolve(pacman, ghosts, session, ghostReleaseScheduler);
-
-        if (maze.noCoinsLeft()) {
-            session.onAllCoinsCollected();
-        }
+        gameLoop.tick(world, session, ghostReleaseScheduler, itemSpawnScheduler, collectibleCollector);
     }
 
-    private void syncGhostFrightenedState() {
-        if (session.isPowered()) {
-            ghosts.forEach(Ghost::enterFrightened);
-        } else {
-            ghosts.forEach(Ghost::exitFrightened);
-        }
-    }
-
-    /**
-     * 當分數 > 2000 時釋放白色幽靈。
-     */
-    private void releaseWhiteGhostIfScoreThreshold() {
-        if (session.getScore() > 2000) {
-            int whiteGhostIndex = GhostKind.index(GhostKind.WHITE);
-            if (whiteGhostIndex >= 0 && whiteGhostIndex < ghosts.size()) {
-                Ghost whiteGhost = ghosts.get(whiteGhostIndex);
-                // 只在幽靈還在等待時釋放
-                if (whiteGhost.getMode() == com.picman.model.entity.GhostMode.WAITING) {
-                    whiteGhost.releaseFromHouse();
-                }
-            }
-        }
-    }
+    // ── 渲染 ──────────────────────────────────────────────────────────────────
 
     public void render(Graphics2D g) {
-        renderer.render(g, maze, pacman, ghosts, session);
+        renderer.render(g, world.getMaze(), world.getPacman(), world.getGhosts(), session);
     }
+
+    // ── 輸入 ──────────────────────────────────────────────────────────────────
 
     public void setActiveDirection(Direction direction) {
         if (session.isPlaying()) {
-            pacman.setActiveDirection(direction);
+            world.getPacman().setActiveDirection(direction);
         }
     }
 
+    // ── 生命週期 ─────────────────────────────────────────────────────────────
+
     public void restart() {
-        maze.reset();
-        pacman.reset();
-        ghostReleaseScheduler.reset(ghosts);
+        world.reset();
+        ghostReleaseScheduler.reset(world.getGhosts());
         itemSpawnScheduler.reset();
         session.reset();
     }
+
+    // ── 狀態查詢（供 GamePanel / GameOverViewModel 使用）──────────────────────
 
     public GameStatus getStatus() {
         return session.getStatus();
@@ -133,11 +98,13 @@ public class Game {
         return session.getElapsedSeconds();
     }
 
+    // ── 版面尺寸（供 GamePanel 初始化用）─────────────────────────────────────
+
     public int getPanelWidth() {
-        return ViewLayout.panelWidth(maze);
+        return ViewLayout.panelWidth(world.getMaze());
     }
 
     public int getPanelHeight() {
-        return ViewLayout.panelHeight(maze);
+        return ViewLayout.panelHeight(world.getMaze());
     }
 }
